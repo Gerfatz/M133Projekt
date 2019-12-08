@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "module": "system",
+        "noImplicitAny": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "outFile": "tsout.js",
+        "sourceMap": true
+    },
+    "compileOnSave": true,
+    "include": [
+        "src/**/*"
+    ]
+}
