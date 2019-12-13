@@ -1,14 +1,13 @@
 <?session_start();
     require_once("partials.php");
     require_once("navigation.php");
+    require_once("header.php");
 ?>
 <!doctype html>
 <html>
     <head>
         <?
-            echo GetPartial("_header", array(
-                "title" => "Home"
-            ));
+            echo GetHeader()
         ?>
     </head>
     <body>

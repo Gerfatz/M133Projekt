@@ -3,7 +3,7 @@
     require_once("BusinessLogic/User.php");
     require_once("BusinessLogic/DBContext.php");
 
-    function GetNavigation():string{
+    function GetNavigation(): string{
         $partialData = array();
 
         if(isset($_SESSION["UserId"])){

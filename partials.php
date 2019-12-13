@@ -1,6 +1,8 @@
 <?
+    require_once("functions.php");
+
     function GetPartial(string $partialName, $arguments = null): string{
-        $html = file_get_contents("partials/" . $partialName . ".html");
+        $html = file_get_contents(GetDirectoryFromPath(__FILE__) . "\\partials\\" . $partialName . ".html");
 
         if($arguments != null){
             foreach ($arguments as $arg => $rep) {
