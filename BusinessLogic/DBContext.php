@@ -13,9 +13,11 @@
             return new User($dbo->query($sql)[0]);
         }
 
-        public function GetUserById(int $userId):User{
+        public function GetUserById(int $userId): User{
             $sql = "SELECT * FROM user WHERE Id = $userId";
-            return new User($dbo->query($sql)[0]);
+            $user = new User();
+            $user->FillFromDatabase($dbo->query($sql)[0]);
+            return $user;
         }
 
         public function Query(string $sql){

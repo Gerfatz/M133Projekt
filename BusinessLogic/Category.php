@@ -1,4 +1,7 @@
 <?
+    require_once("User.php");
+    require_once("DBContext.php");
+    
     class Category{
         private $id;
         private $name;

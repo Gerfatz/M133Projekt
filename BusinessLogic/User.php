@@ -1,10 +1,12 @@
 <?
+    require_once("DBContext.php");
+
     class User{
         private $id;
         private $username;
         private $passwordHash;
 
-        public function __construct($dbRow){
+        public function FillFromDatabase($dbRow){
             $id = $dbRow["Id"];
             $username = $dbRow["username"];
             $passwordHash = $dbRow["passwordHash"];
