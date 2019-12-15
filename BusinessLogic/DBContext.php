@@ -1,27 +1,20 @@
 <?
-    require_once("User.php");
+    require_once(GetPath() . "BusinessLogic/User.php");
+    require_once(GetPath() . "configuration.php");
 
     class DBContext{
         private $dbo;
 
         public function __construct(){
-            $dbo = new PDO("mysql:host=localhost;dbname=memeio", "dario");
+            $this->dbo = new PDO(GetConfigValue("connectionString"), GetConfigValue("mySqlUsername"));
         }
 
-        public function GetUserByName(string $username): User{
-            $sql = "SELECT * FROM user WHERE username = $username";
-            return new User($dbo->query($sql)[0]);
+        public function PrepareQuery(string $sql): PDOStatement{
+            return $this->dbo->prepare($sql);
         }
 
-        public function GetUserById(int $userId): User{
-            $sql = "SELECT * FROM user WHERE Id = $userId";
-            $user = new User();
-            $user->FillFromDatabase($dbo->query($sql)[0]);
-            return $user;
-        }
-
-        public function Query(string $sql){
-            return $dbo->query($sql);
+        public function Query(string $sql): PDOStatement{
+            return $this->dbo->query($sql);
         }
     }
 ?>

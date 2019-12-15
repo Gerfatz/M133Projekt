@@ -1,15 +1,14 @@
 <?session_start();
-
-    require_once("partials.php");
-    require_once("navigation.php");
+    require_once("../functions.php");
+    require_once(GetPath() . "partials.php");
+    require_once(GetPath() . "header.php");
+    require_once(GetPath() . "navigation.php");
 ?>
 <!doctype html>
 <html>
     <head>
         <?
-            echo GetPartial("_header", array(
-                "title" => "Home"
-            ));
+            echo GetHeader("Login");
         ?>
     </head>
     <body>
@@ -21,17 +20,30 @@
             var login = new Login();
         </script>
 
-        <div class="row">
+        <div class="row d-flex justify-content-center mt-2">
             <div class="col-6">
                 <div class="card">
                     <div class="card-body">
-                        <h4 class="card-title">Als neuer Benutzer registrieren</h4>
+                        <h4 class="card-title">Login</h4>
 
-                        <form action="Account/createUser.php" method="post" id="loginform">
-                            <input class="form-control" type="text" name="username" id="username"/>
-                            <input class="form-control" type="password" name="password" id="password"/>
+                        <form action="signIn.php" method="post" id="loginform">
+                            <div class="form-control-group">
+                                <label for="username">Benutzername</label>
+                                <input class="form-control mb-2" type="text" <?
+                                    if(array_key_exists("username", $_GET)){
+                                        $username = $_GET["username"];
+                                        echo "value=\"$username\"";
+                                    }
+                                ?> name="username" ref="username"/>
+                            </div>
+                            
 
-                            <button class="btn btn-primary" onclick="login.ValidateForm(document.getElementById('loginform'))">Registrieren</button>
+                            <div class="form-control-group"> 
+                                <label for="password">Passwort</label>
+                                <input class="form-control mb-2" type="password" name="password" ref="password"/>
+                            </div>
+
+                            <button class="btn btn-primary" onclick="login.ValidateForm(document.getElementById('loginform'))">Login</button>
                         </form>
                     </div>
                 </div>

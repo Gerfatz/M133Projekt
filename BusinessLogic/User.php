@@ -1,35 +1,31 @@
 <?
-    require_once("DBContext.php");
-
     class User{
-        private $id;
-        private $username;
-        private $passwordHash;
-
-        public function FillFromDatabase($dbRow){
-            $id = $dbRow["Id"];
-            $username = $dbRow["username"];
-            $passwordHash = $dbRow["passwordHash"];
-        }
+        private $Id = 0;
+        private $username = "";
+        private $passwordHash= "";
 
         public function GetId(): int{
-            return $id;
+            return $this->Id;
         }
 
         public function HashPassword(string $password){
-            $passwordHash = hash("sha256", $password);
+            $this->passwordHash = hash("sha256", $password);
         }
 
-        public function VerifyPassword(string $password): boolean{
-            return $passwordHash == hash("sha256", $password);
+        public function VerifyPassword(string $password): bool{
+            return $this->passwordHash == hash("sha256", $password);
         }
 
         public function GetUsername(): string{
-            return $username;
+            return $this->username;
         }
 
         public function SetUsername(string $newName){
-            $username = $newName;
+            $this->username = $newName;
+        }
+
+        public function GetPasswordHash(){
+            return $this->passwordHash;
         }
     }
 ?>

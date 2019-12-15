@@ -10,9 +10,13 @@ const validateSearch = (elementId: string): boolean => {
 }
 
 const validateXSS = (input: string): boolean => {
-    return input.match(/(\b)(on\S+)(\s*)=|javascript|(<\s*)(\/*)script/ig).length == 0;
+    return input.match(/(\b)(on\S+)(\s*)=|javascript|(<\s*)(\/*)script/ig) == null;
 }
 
 const validateSQL = (input: string): string => {
     return input.match(/(^[a-zA-Z0-9])+/g).join()
+}
+
+class Config{
+    static baseUrl: string;
 }

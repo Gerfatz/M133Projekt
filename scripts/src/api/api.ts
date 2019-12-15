@@ -32,9 +32,9 @@ class API{
     }
 
     private static Request(method: string, url: string, data: any, resolve: Function, reject: Function){
+
         let request = new XMLHttpRequest();
-    
-        request.open("POST", url);
+        request.open("POST", Config.baseUrl + url);
 
         request.onreadystatechange = () => {
             if(request.readyState == 4){

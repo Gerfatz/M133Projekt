@@ -1,13 +1,14 @@
 <?session_start();
-    require_once("partials.php");
-    require_once("navigation.php");
-    require_once("header.php");
+    require_once("functions.php");
+    require_once(GetPath() . "partials.php");
+    require_once(GetPath() . "navigation.php");
+    require_once(GetPath() . "header.php");
 ?>
 <!doctype html>
 <html>
     <head>
         <?
-            echo GetHeader()
+            echo GetHeader("Home");
         ?>
     </head>
     <body>

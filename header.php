@@ -1,13 +1,11 @@
 <?
-    require_once("configuration.php");
+    require_once(GetPath() . "configuration.php");
 
-    function GetHeader(): string
+    function GetHeader(string $title): string
     {
-        $url = GetConfigValue("url");
-
         return GetPartial("_header", array(
-            "title" => $url,
-            "url" => $url
+            "title" => $title,
+            "url" => GetConfigValue("url")
         ));
     }
 ?>

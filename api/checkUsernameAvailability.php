@@ -1,10 +1,11 @@
 <?
-    require_once("../BusinessLogic/DBContext.php");
+    require_once("../functions.php");
+    require_once(GetPath() . "BusinessLogic/Repositories/UserRepository.php");
 
     if(array_key_exists("username", $_GET)){
-        $db = new DBContext();
+        $repo = new UserRepository();
 
-        if($db->Query("SELECT COUNT(username) as count FROM user WHERE username = " . $_GET["username"])["count"] == 0){
+        if($repo->IsUsernameAvailable($_GET["username"])){
             echo "1";
         }
         else{

@@ -1,5 +1,5 @@
 <?
-    require_once("functions.php");
+    require_once(GetPath() . "functions.php");
 
     function GetPartial(string $partialName, $arguments = null): string{
         $html = file_get_contents(GetDirectoryFromPath(__FILE__) . "\\partials\\" . $partialName . ".html");
