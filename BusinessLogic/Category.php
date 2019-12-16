@@ -3,14 +3,14 @@
     require_once("DBContext.php");
     
     class Category{
-        private $Id;
-        private $name;
-        private $description;
-        private $ownerId;
-        private $owner;
+        private $Id = 0;
+        private $name = "";
+        private $description = "";
+        private $ownerId = 0;
+        private $owner = null;
 
         public function GetId(): int{
-            return $id;
+            return $this->Id;
         }
 
         public function GetOwner(): User{

@@ -11,23 +11,29 @@
             return $statement->fetchAll();
         }
 
-        public function GetCategoryByName($name): Category{
+        public function GetCategoryByName(string $name): Category{
             $statement = $this->db->Query("SELECT * FROM category WHERE name='$name'");
             $statement->setFetchMode(PDO::FETCH_CLASS, "Category");
             return $statement->fetch();
         }
 
-        public function CreateNewCategory(string $name, string $description = "", int $userId = $_SESSION["UserId"]): Category
+        public function GetCategoryById(int $id): Category{
+            $statement = $this->db->Query("SELECT * FROM category WHERE Id=$id");
+            $statement->setFetchMode(PDO::FETCH_CLASS, "Category");
+            return $statement->fetch();
+        }
+
+        public function CreateNewCategory(string $name, int $userId, string $description = ""): Category
         {
             $category = new Category();
             $category->SetName($name);
             $category->SetDescription($description);
             $category->SetOwner($userId);
             $this->Save($category);
-            return $category;
+            return $this->GetCategoryByName($name);
         }
 
-        public function Save(&$category){
+        public function Save($category){
             $sql = "";
 
             $args = array(
@@ -47,8 +53,6 @@
             $statement = $this->db->PrepareQuery($sql);
 
             $statement->execute($args);
-
-            $category = $this->GetCategoryByName($name);
         }
     }
 ?>
