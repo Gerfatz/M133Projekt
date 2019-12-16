@@ -61,7 +61,7 @@ class API {
 }
 class Login {
     ValidateForm(loginForm) {
-        loginForm.send();
+        loginForm.submit();
     }
     ValidateUsername(username) {
         let name = username.value;

@@ -4,7 +4,9 @@
     require_once(GetPath() . "BusinessLogic/Repositories/UserRepository.php");
 
     function GetNavigation(): string{
-        $partialData = array();
+        $partialData = array(
+            "url" => GetConfigValue("url")
+        );
 
         if(isset($_SESSION["UserId"])){
             $repo = new UserRepository();

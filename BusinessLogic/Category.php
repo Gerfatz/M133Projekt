@@ -3,7 +3,7 @@
     require_once("DBContext.php");
     
     class Category{
-        private $id;
+        private $Id;
         private $name;
         private $description;
         private $ownerId;
@@ -14,33 +14,36 @@
         }
 
         public function GetOwner(): User{
-            if($owner == null){        
+            if($this->owner == null){        
                 $db = new DBContext();
-                $owner = $db->GetUserById($owner);
+                $this->owner = $db->GetUserById($owner);
             }
 
-            return $owner;
+            return $this->owner;
         }
 
-        public function SetOwner(User $newOwner){
-            $owner = $newOwner;
-            $ownerId = $newOwner->GetId();
+        public function GetOwnerId(): int{
+            return $this->ownerId;
+        }
+
+        public function SetOwner(int $ownerId){
+            $this->ownerId = $ownerId;
         }
 
         public function GetName(): string{
-            return $name;
+            return $this->name;
         }
 
         public function SetName(string $newName){
-            $name = $newName;
+            $this->name = $newName;
         }
 
         public function GetDescription(): string{
-            return $description;
+            return $this->description;
         }
 
         public function SetDescription($newDescription){
-            $description = $newDescription;
+            $this->description = $newDescription;
         }
     }
 ?>

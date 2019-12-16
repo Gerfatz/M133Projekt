@@ -1,6 +1,6 @@
 class Login{
     ValidateForm(loginForm: HTMLFormElement){
-        loginForm.send();
+        loginForm.submit();
     }
 
     ValidateUsername(username: HTMLInputElement){
