@@ -1,5 +1,5 @@
 <?
-    require_once(GetPath() .  "BusinessLogic/DBContext.php");
+    require_once(GetPath() .  "BusinessLogic/Repositories/DBContext.php");
 
     abstract class RepositoryBase{
         protected $db;

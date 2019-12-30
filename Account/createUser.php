@@ -3,7 +3,7 @@
     //Add Validation
     
     require_once("../functions.php");
-    require_once(GetPath() . "BusinessLogic/User.php");
+    require_once(GetPath() . "BusinessLogic/ViewModels/UserViewModel.php");
     require_once(GetPath() . "BusinessLogic/Repositories/UserRepository.php");
     require_once(GetPath() . "configuration.php");
     require_once(GetPath() . "navigation.php");
@@ -24,7 +24,7 @@
             <?
         }
         else{
-            $_SESSION["UserId"] = $user->GetId();
+            $_SESSION["UserId"] = $user->Id;
 
             header("Location: " . GetConfigValue("url"));
         }

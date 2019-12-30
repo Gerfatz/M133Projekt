@@ -15,14 +15,65 @@ const validateSQL = (input) => {
 };
 class Config {
 }
+class CategoryUI {
+    static renderCategory(parent, category, linkToCategory = false) {
+        let title = parent.find("title");
+        let span = title.appendChild(document.createElement("span"));
+        let icon = span.appendChild(document.createElement("i"));
+        span.className = "float-right";
+        span.setAttribute("_onclick", "");
+        span.title = category.Subscribed ? "Deabonnieren" : "Abonnieren";
+        icon.className = category.Subscribed ? "fa fa-times text-danger" : "fa fa-bell text-primary";
+        if (linkToCategory) {
+            parent.onclick = () => {
+                location.href = Config.baseUrl + "/Kategorien/details.php?categoryId=" + category.Id;
+            };
+        }
+        span.onclick = (e) => {
+            e.stopPropagation();
+            icon.className = "fa fa-spin fa-sync";
+            span.title = category.Subscribed ? "Deabonnieren" : "Abonnieren";
+            API.POST("/api/subscribe.php", { categoryId: category.Id }).then((res) => {
+                icon.className = parseInt(res) ? "fa fa-times text-danger" : "fa fa-bell text-primary";
+            });
+        };
+        let createButton = parent.find("create-post");
+        if (createButton) {
+            createButton.onclick = (e) => {
+                e.stopPropagation();
+                $("#create-post-modal").modal();
+            };
+        }
+    }
+}
+class PostUI {
+    constructor() {
+        this.default = select.appendChild(document.createElement("option"));
+        this.textContent = categoryName;
+    }
+    static RenderCategoryDropdown(parent, categoryId = 0, categoryName = "") {
+        let select = parent.find("category-select");
+        let;
+    }
+    GET() { }
+    then() { }
+}
+(res) => {
+    res = JSON.parse(res);
+    for (let category of res) {
+        let option = select.appendChild(document.createElement("option"));
+        option.textContent = category.Name;
+        option.setAttribute("value", category.Id);
+    }
+};
 class API {
-    static GET(url, params) {
+    static GET(url, params = null) {
         return new Promise((resolve, reject) => {
             if (params) {
                 url += '?';
-            }
-            for (let key in params) {
-                url += key + "=" + params[key];
+                for (let key in params) {
+                    url += key + "=" + params[key];
+                }
             }
             this.Request("GET", url, "", resolve, reject);
         });
@@ -66,23 +117,23 @@ class Login {
     ValidateUsername(username) {
         let name = username.value;
         if (name && validateXSS(name) && name.match(/([A-Za-z0-9_]){0,}\w+/g).join("").length == name.length) {
-            let spinner = username.parentElement.find("usernameCheck");
-            if (!spinner) {
-                spinner = document.createElement("i");
-                spinner.setAttribute("ref", "usernameCheck");
-            }
-            spinner.className = "fa fa-spin fa-refresh";
-            username.parentElement.appendChild(spinner);
-            API.GET("/api/checkUsernameAvailability.php", { "username": name }).then((res) => {
-                if (res) {
+            let spinner = username.parentElement.find("username-check");
+            spinner.className = "fa fa-spin fa-sync";
+            API.GET("/api/checkUsernameAvailability.php", { "username": name })
+                .then((res) => {
+                if (JSON.parse(res)) {
                     spinner.className = "fa fa-check";
+                    spinner.removeAttribute("title");
                 }
                 else {
-                    spinner.className = "fa fa-cross";
+                    spinner.className = "fa fa-times";
+                    spinner.setAttribute("title", "Dieser Benutzername ist nicht verfügbar");
                 }
             });
         }
     }
+}
+class Category {
 }
 if (!HTMLElement.prototype.find) {
     HTMLElement.prototype.find = function (ref) {

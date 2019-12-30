@@ -1,4 +1,5 @@
 class Login{
+
     ValidateForm(loginForm: HTMLFormElement){
         loginForm.submit();
     }
@@ -8,24 +9,21 @@ class Login{
 
         if(name && validateXSS(name) && name.match(/([A-Za-z0-9_]){0,}\w+/g).join("").length == name.length){
             
-            let spinner = username.parentElement.find("usernameCheck");
+            let spinner = username.parentElement.find("username-check");
 
-            if(!spinner){
-                spinner = document.createElement("i");
-                spinner.setAttribute("ref", "usernameCheck");
-            }
+            spinner.className = "fa fa-spin fa-sync";
 
-            spinner.className = "fa fa-spin fa-refresh";
-            username.parentElement.appendChild(spinner);
-
-            API.GET("/api/checkUsernameAvailability.php", {"username" : name}).then((res) => {
-                if(res)
+            API.GET("/api/checkUsernameAvailability.php", {"username" : name})
+            .then((res) => {
+                if(JSON.parse(res))
                 {
                     spinner.className = "fa fa-check";
+                    spinner.removeAttribute("title");
                 }
                 else
                 {
-                    spinner.className = "fa fa-cross";
+                    spinner.className = "fa fa-times";
+                    spinner.setAttribute("title", "Dieser Benutzername ist nicht verfügbar");
                 }
             })
         }

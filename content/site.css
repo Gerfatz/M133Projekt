@@ -2,3 +2,11 @@
     background-color: #d3d3d3;
     border-bottom: solid grey 1px;
 }
+
+.list-group-item-action{
+    cursor: pointer;
+}
+
+span[_onclick]{
+    cursor: pointer;
+}

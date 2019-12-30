@@ -1,0 +1,32 @@
+<div class="modal fade" id="create-post-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Neuer Post</h4>     
+                <button class="close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="%url%/Post/create.php" enctype="multipart/form-data">
+                    <div class="form-control-group mb-2">
+                        <label for="title">Titel</label>
+                        <input class="form-control" type="text" id="title" name="title"/>
+                    </div>
+                    <div class="form-control-group mb-2">
+                        <label for="picture">Bild</label>
+                        <input type="file" name="picture" id="picture" class="form-control-file" accept=".jpg,.jepg,.bmp,.png,.gif">
+                    </div>
+                    <div class="form-control-group mb-2">
+                        <label for="category">Kategorie</label>
+                        <select ref="category-select" name="category" class="form-control"></select>
+                    </div>
+                    <input type="submit" value="Posten" class="btn btn-primary"/>
+                    <script>
+                        PostUI.RenderCategoryDropdown(document.currentScript.parentElement)
+                    </script>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

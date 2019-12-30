@@ -30,6 +30,7 @@
                         <form action="createUser.php" method="post" id="loginform">
                             <div class="form-control-group">
                                 <label for="username">Benutzername</label>
+                                <i ref="username-check"></i>
                                 <input class="form-control mb-2" type="text" name="username" ref="username" onkeyup="login.ValidateUsername(document.getElementById('loginform').find('username'))"/>
                             </div>
                             

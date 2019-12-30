@@ -22,6 +22,24 @@
 
         <div class="row d-flex justify-content-center mt-2">
             <div class="col-6">
+                <?
+                    if(isset($_GET["message"])){
+                        ?>
+                            <span class="alert alert-warning">
+                        <?
+                        if($_GET["message"] == 1)
+                        {
+                            echo "Es wurde kein Benutzer mit diesem Benutzername gefunden";
+                        }
+                        else if ($_GET["message"] == 2)
+                        {
+                            echo "Das angegebene Passwort ist falsch";
+                        }
+                        ?>
+                            </span>
+                        <?
+                    }
+                ?>
                 <div class="card">
                     <div class="card-body">
                         <h4 class="card-title">Login</h4>

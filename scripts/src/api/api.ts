@@ -1,13 +1,15 @@
 class API{
-    static GET(url: string, params: any): Promise<any>{
+    static GET(url: string, params: any = null): Promise<any>{
         return new Promise((resolve: Function, reject: Function) => {        
             if(params){
                 url += '?';
+                
+                for(let key in params){
+                    url += key + "=" + params[key];
+                }
             }
     
-            for(let key in params){
-                url += key + "=" + params[key];
-            }
+
         
             this.Request("GET", url, "", resolve, reject)
         });       
@@ -48,7 +50,7 @@ class API{
         }
 
         request.onerror = () => {reject(Error(method + " Request failed because of an network error"))}
-
+        
         request.send(JSON.stringify(data));
     }
 }
