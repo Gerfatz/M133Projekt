@@ -3,7 +3,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">Neuer Post</h4>     
-                <button class="close">
+                <button class="close" onclick="">
                     <span>&times;</span>
                 </button>
             </div>
@@ -22,9 +22,6 @@
                         <select ref="category-select" name="category" class="form-control"></select>
                     </div>
                     <input type="submit" value="Posten" class="btn btn-primary"/>
-                    <script>
-                        PostUI.RenderCategoryDropdown(document.currentScript.parentElement)
-                    </script>
                 </form>
             </div>
         </div>

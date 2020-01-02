@@ -2,8 +2,8 @@
     session_start();
 
     require_once("../functions.php");
-    require_once(GetPath() . "BusinessLogic/Category.php");
     require_once(GetPath() . "BusinessLogic/Repositories/CategoryRepository.php");
+    require_once(GetPath() . "BusinessLogic/ViewModels/CategoryViewModel.php");
     require_once(GetPath() . "header.php");
     require_once(GetPath() . "navigation.php");
     require_once(GetPath() . "security.php");
@@ -14,7 +14,7 @@
     if(array_key_exists("name", $_POST) && array_key_exists("description", $_POST) && isset($_SESSION["UserId"])){
         $repo = new CategoryRepository();
         $category = $repo->CreateNewCategory($_POST["name"], $_SESSION["UserId"], $_POST["description"]);
-        header("location:" . GetConfigValue("url") . "/Kategorien/details.php?categoryId=". $category->GetId());
+        header("location:" . GetConfigValue("url") . "/Kategorien/details.php?categoryId=". $category->Id);
     }
 ?>
 <!doctype html>

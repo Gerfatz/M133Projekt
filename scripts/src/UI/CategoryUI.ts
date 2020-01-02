@@ -26,17 +26,17 @@ class CategoryUI{
             
             API.POST("/api/subscribe.php", {categoryId: category.Id}).then((res: string) => {      
                 icon.className = parseInt(res) ? "fa fa-times text-danger" : "fa fa-bell text-primary";
+                category.Subscribed = res === "1";
+                PostUI.RegisterCreatePostModal(
+                    document.body.find("create-post"), 
+                    category
+                );
             })
         }
-
-        //Modal open on details page
-        let createButton = parent.find("create-post");
-
-        if(createButton){
-            createButton.onclick = (e) => {
-                e.stopPropagation();
-                $("#create-post-modal").modal();
-            }
-        }
+        
+        PostUI.RegisterCreatePostModal(
+            document.body.find("create-post"),
+            category
+        );
     }
 }

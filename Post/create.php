@@ -3,6 +3,7 @@
 
     include_once("../functions.php");
     include_once(GetPath() . "/BusinessLogic/Repositories/PostRepository.php");
+    include_once(GetPath() . "/BusinessLogic/Repositories/CategoryRepository.php");
     include_once(GetPath() . "security.php");
     include_once(GetPath() . "configuration.php");
 
@@ -12,8 +13,11 @@
         http_response_code(400);
     }
     else{
+        $categoryRepo = new CategoryRepository();
+        $category = $categoryRepo->GetCategoryById($_POST["category"]);
         $ext = strtolower(end(explode('.',$_FILES["picture"]["name"])));
-        $path = GetPath(). "Images/". com_create_guid() . ".$ext";
+        $filename = GetGUID() . ".$ext";
+        $path = GetPath(). "Images/". $category->Name . "/" . $filename;
         move_uploaded_file($_FILES["picture"]["tmp_name"], $path);
         
         $repo = new PostRepository();
@@ -21,7 +25,7 @@
         $model->CreatorId = $_SESSION["UserId"];
         $model->CategoryId = $_POST["category"];
         $model->Title = $_POST["title"];
-        $model->PicturePath = $path;
+        $model->FileName = $filename;
         $repo->Save($model);
 
         header("location:" . GetConfigValue("url"));

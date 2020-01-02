@@ -7,7 +7,7 @@
         public $CategoryId;
         public $CategoryName;
         public $UploadDate;
-        public $PicturePath;
+        public $FileName;
 
         public $Comments;
     }

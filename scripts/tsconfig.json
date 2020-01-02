@@ -2,7 +2,9 @@
     "compilerOptions": {
         "module": "system",
         "target": "ES2019",
-        "noImplicitAny": true,
+        "jsx": "react",
+        "jsxFactory": "CreateElement",
+        "noImplicitAny": false,
         "removeComments": true,
         "preserveConstEnums": true,
         "outFile": "tsout.js",

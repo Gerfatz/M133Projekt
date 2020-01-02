@@ -8,13 +8,34 @@ const validateSearch = (elementId) => {
     return false;
 };
 const validateXSS = (input) => {
-    return input.match(/(\b)(on\S+)(\s*)=|javascript|(<\s*)(\/*)script/ig) == null;
+    return (input.match(/(\b)(on\S+)(\s*)=|javascript|(<\s*)(\/*)script/gi) == null);
 };
 const validateSQL = (input) => {
     return input.match(/(^[a-zA-Z0-9])+/g).join();
 };
 class Config {
 }
+const CreateElement = (tagname, attributes, content) => {
+    let element = document.createElement(tagname);
+    if (attributes) {
+        for (const key in attributes) {
+            if (attributes.hasOwnProperty(key)) {
+                element.setAttribute(key, attributes[key]);
+            }
+        }
+    }
+    if (content) {
+        if (typeof content === "string") {
+            element.textContent = content;
+        }
+        else {
+            for (const child of content) {
+                element.appendChild(child);
+            }
+        }
+    }
+    return element;
+};
 class CategoryUI {
     static renderCategory(parent, category, linkToCategory = false) {
         let title = parent.find("title");
@@ -35,37 +56,47 @@ class CategoryUI {
             span.title = category.Subscribed ? "Deabonnieren" : "Abonnieren";
             API.POST("/api/subscribe.php", { categoryId: category.Id }).then((res) => {
                 icon.className = parseInt(res) ? "fa fa-times text-danger" : "fa fa-bell text-primary";
+                category.Subscribed = res === "1";
+                PostUI.RegisterCreatePostModal(document.body.find("create-post"), category);
             });
         };
-        let createButton = parent.find("create-post");
-        if (createButton) {
-            createButton.onclick = (e) => {
-                e.stopPropagation();
-                $("#create-post-modal").modal();
-            };
-        }
+        PostUI.RegisterCreatePostModal(document.body.find("create-post"), category);
     }
 }
 class PostUI {
-    constructor() {
-        this.default = select.appendChild(document.createElement("option"));
-        this.textContent = categoryName;
+    static RegisterCreatePostModal(trigger, category) {
+        if (!category || category.Subscribed) {
+            trigger.onclick = e => {
+                e.stopPropagation();
+                $("#create-post-modal").modal("show");
+            };
+        }
+        else {
+            trigger.onabort = () => {
+                alert("Es kann nur in abonnierten Kategorien gepostet werden");
+            };
+        }
+        const modal = document.getElementById("create-post-modal");
+        let select = modal.find("category-select");
+        if (category) {
+            let defaultOption = select.find("default-option");
+            if (!defaultOption) {
+                defaultOption = select.appendChild(CreateElement("option", { value: category.Id, ref: "default-option" }, category.Name));
+            }
+        }
+        API.GET("/api/getSubscribedCategories.php").then(res => {
+            res = JSON.parse(res);
+            for (let cat of res) {
+                if (![...select.childNodes]
+                    .map(o => o.getAttribute("value"))
+                    .filter(v => v == cat.Id)
+                    .length) {
+                    select.appendChild(CreateElement("option", { value: cat.Id }, cat.Name));
+                }
+            }
+        });
     }
-    static RenderCategoryDropdown(parent, categoryId = 0, categoryName = "") {
-        let select = parent.find("category-select");
-        let;
-    }
-    GET() { }
-    then() { }
 }
-(res) => {
-    res = JSON.parse(res);
-    for (let category of res) {
-        let option = select.appendChild(document.createElement("option"));
-        option.textContent = category.Name;
-        option.setAttribute("value", category.Id);
-    }
-};
 class API {
     static GET(url, params = null) {
         return new Promise((resolve, reject) => {

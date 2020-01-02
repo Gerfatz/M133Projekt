@@ -14,6 +14,13 @@
             return $statement->fetchAll();
         }
 
+        public function GetSubscribedCategories(int $userId):array{
+            $sql = "SELECT category.Id as Id, category.Name as Name from category RIGHT JOIN subscription ON category.Id = subscription.CategoryId WHERE subscription.UserId = $userId";
+            $statement = $this->db->Query($sql);
+            $statement->setFetchMode(PDO::FETCH_CLASS, "CategoryViewModel");
+            return $statement->fetchAll();
+        }
+
         public function GetCategoryByName(string $name, int $userId): CategoryViewModel{  
             $sql = str_replace(":userId", $userId, $this->baseSQL) . " WHERE name = '$name'";
             $statement = $this->db->Query($sql);
@@ -21,7 +28,7 @@
             return $statement->fetch();
         }
 
-        public function GetCategoryById(int $id, int $userId): CategoryViewModel{
+        public function GetCategoryById(int $id, int $userId = 0): CategoryViewModel{
             $sql = str_replace(":userId", $userId, $this->baseSQL) . " WHERE Id = $id";
             $statement = $this->db->Query($sql);
             $statement->setFetchMode(PDO::FETCH_CLASS, "CategoryViewModel");
@@ -58,8 +65,11 @@
             $category->name = $name;
             $category->description = $description;
             $category->ownerId = $userId;
+
+            mkdir(GetPath() . "Images/" . $name);
+
             $this->Save($category);
-            return $this->GetCategoryByName($name);
+            return $this->GetCategoryByName($name, $userId);
         }
 
         public function Save($category){
@@ -76,7 +86,7 @@
             }
             else{
                 $sql = "UPDATE user SET name=:name, description=:description creatorId=:creatorId WHERE Id=:id";
-                $args[":id"] = $category->GetId();
+                $args[":id"] = $category->Id;
             }
             
             $statement = $this->db->PrepareQuery($sql);
