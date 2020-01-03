@@ -6,7 +6,7 @@ class PostUI {
                 $("#create-post-modal").modal("show");
             };
         } else {
-            trigger.onabort = () => {
+            trigger.onclick = () => {
                 alert("Es kann nur in abonnierten Kategorien gepostet werden");
             };
         }
@@ -40,5 +40,17 @@ class PostUI {
                 }
             }
         });
+    }
+
+    static RenderRating(parent: HTMLElement, currentRating: number){
+        let i = 1;
+
+        for(; i<=currentRating; i++){
+            parent.appendChild(<i class="fas fa-star" value={i}></i>);
+        }
+
+        for(; i<=5; i++){
+            parent.appendChild(<i class="far fa-star" value={i}></i>);
+        }
     }
 }

@@ -26,14 +26,19 @@ class Config {
 const CreateElement = (
     tagname: string,
     attributes?: Object,
-    content?: string | Array<HTMLElement>
+    ...content: Array<HTMLElement>
 ): HTMLElement => {
     let element = document.createElement(tagname);
 
     if (attributes) {
         for (const key in attributes) {
             if (attributes.hasOwnProperty(key)) {
-                element.setAttribute(key, (attributes as any)[key]);
+                if(typeof attributes[key] == "function"){
+                    element[key] = attributes[key];
+                    element.setAttribute("_" + key, "");
+                }else{
+                    element.setAttribute(key, attributes[key]);
+                }
             }
         }
     }

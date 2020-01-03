@@ -12,6 +12,15 @@
                 <i class="fa fa-list"></i>%CategoryName%
             </a>
         </div>
-        <img class="img-fluid" src="%url%/Images/%CategoryName%/%FileName%">
+        <div class="d-flex justify-content-center">
+            <img class="img-fluid" src="%url%/Images/%CategoryName%/%FileName%">
+        </div>
+    </div>
+    <div class="card-footer d-flex justify-content-around">
+        <span>
+            <script>
+                PostUI.RenderRating(document.currentScript.parentElement, %CurrentRating%)    
+            </script>
+        </span>
     </div>
 </div>
