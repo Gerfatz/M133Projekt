@@ -3,10 +3,8 @@
     border-bottom: solid grey 1px;
 }
 
-.list-group-item-action{
-    cursor: pointer;
-}
-
+.cursor-pointer,
+.list-group-item-action,
 span[_onclick]{
     cursor: pointer;
 }

@@ -44,8 +44,8 @@ const CreateElement = (
     }
 
     if (content) {
-        if (typeof content === "string") {
-            element.textContent = content;
+        if (typeof content[0] === "string") {
+            element.textContent = content[0];
         } else {
             for (const child of content) {
                 element.appendChild(child);

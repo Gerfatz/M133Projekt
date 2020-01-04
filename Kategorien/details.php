@@ -26,7 +26,7 @@
         $catRepo = new CategoryRepository();
         $category = $catRepo->GetCategoryById($_GET["categoryId"], $userId);
         $postRepo = new PostRepository();
-        $posts = $postRepo->GetAllPostsFromCategory($category->Id); 
+        $posts = $postRepo->GetAllPostsFromCategory($category->Id, $userId); 
         $categoryJson = json_encode($category);
     }
 ?>
@@ -76,6 +76,11 @@
                     foreach ($posts as $post) {
                         $args = (array) $post;
                         $args["url"] = GetConfigValue("url");
+
+                        if(!isset($args["Rating"])){
+                            $args["Rating"] = 0;
+                        }
+
                         echo GetPartial("_post", $args);
                     }
                 ?>

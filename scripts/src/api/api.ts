@@ -5,8 +5,10 @@ class API{
                 url += '?';
                 
                 for(let key in params){
-                    url += key + "=" + params[key];
+                    url += key + "=" + params[key] + "&";
                 }
+
+                url = url.substr(0, url.length - 1);
             }
     
 

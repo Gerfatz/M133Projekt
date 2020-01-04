@@ -31,8 +31,7 @@ class PostUI {
                 if (
                     ![...select.childNodes]
                         .map(o => (o as HTMLElement).getAttribute("value"))
-                        .filter(v => v == cat.Id)
-                        .length
+                        .filter(v => v == cat.Id).length
                 ) {
                     select.appendChild(
                         <option value={cat.Id}>{cat.Name}</option>
@@ -42,15 +41,41 @@ class PostUI {
         });
     }
 
-    static RenderRating(parent: HTMLElement, currentRating: number){
+    static RenderRating(parent: HTMLElement, postId: number, currentRating: number) {
+        const stars = new Array<HTMLElement>();
+        const ratingClick = e => {
+            const userRating = e.target.getAttribute("value");
+            
+            API.GET("/api/rate.php", {
+                rating: e.target.getAttribute("value"),
+                postId: postId
+            });
+
+            stars
+                .filter(i => i.getAttribute("value") <= userRating)
+                .forEach(i => (i.className = "fas fa-star cursor-pointer"));
+            
+            stars
+                .filter(i => i.getAttribute("value") > userRating)
+                .forEach(i => (i.className = "far fa-star cursor-pointer"));
+        };
+
         let i = 1;
 
-        for(; i<=currentRating; i++){
-            parent.appendChild(<i class="fas fa-star" value={i}></i>);
+        for (; i <= currentRating; i++) {
+            stars.push(
+                parent.appendChild(
+                    <i class="fas fa-star cursor-pointer" value={i} onclick={ratingClick}></i>
+                )
+            );
         }
 
-        for(; i<=5; i++){
-            parent.appendChild(<i class="far fa-star" value={i}></i>);
+        for (; i <= 5; i++) {
+            stars.push(
+                parent.appendChild(
+                    <i class="far fa-star cursor-pointer" value={i} onclick={ratingClick}></i>
+                )
+            );
         }
     }
 }

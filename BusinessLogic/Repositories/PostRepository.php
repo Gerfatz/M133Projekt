@@ -12,11 +12,33 @@
         }
 
         public function GetAllPostsFromCategory(int $categoryId, int $userId = 0): array{
-            $sql = "SELECT post.Id AS Id, post.title AS Title, post.categoryId AS CategoryId, post.creatorId AS CreatorId, post.uploadDate AS UploadDate, post.fileName AS FileName, ( SELECT category.name FROM category WHERE post.categoryId = category.Id ) AS CategoryName, ( SELECT user.username FROM user WHERE post.creatorId = user.Id ) AS CreatorName FROM post WHERE categoryId = :categoryId";
+            $sql = "SELECT post.Id AS Id, post.title AS Title, post.categoryId AS CategoryId, post.creatorId AS CreatorId, post.uploadDate AS UploadDate, post.fileName AS FileName, ( SELECT category.name FROM category WHERE post.categoryId = category.Id ) AS CategoryName, ( SELECT user.username FROM user WHERE post.creatorId = user.Id ) AS CreatorName, (SELECT rating.rating FROM rating WHERE PostId = post.Id AND UserId = :userId) AS Rating FROM post WHERE categoryId = :categoryId";
             $sql = str_replace(":categoryId", $categoryId, $sql);
+            $sql = str_replace(":userId", $userId, $sql);
             $statement = $this->db->Query($sql);
             $statement->setFetchMode(PDO::FETCH_CLASS, "PostViewModel");
             return $statement->fetchAll();
+        }
+
+        public function SaveRating(int $userId, int $postId, int $rating)
+        {
+            $existsQuery = $this->db->Query("SELECT * FROM rating WHERE PostId = $postId AND UserId = $userId");
+            $sql = "";
+            $args = array(
+                    ":postId" => $postId,
+                    ":userId" => $userId,
+                    ":rating" => $rating
+                );
+
+            if($existsQuery->rowCount() == 0){
+                $sql = "INSERT INTO rating (PostId, UserId, rating) VALUES (:postId, :userId, :rating)";
+            }
+            else{
+                $sql = "UPDATE rating SET rating = :rating WHERE PostId = :postId AND UserId = :userId";
+            }
+
+            $statement = $this->db->PrepareQuery($sql);
+            $statement->execute($args);
         }
 
         public function Save($model): PostViewModel{

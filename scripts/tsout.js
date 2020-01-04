@@ -31,8 +31,8 @@ const CreateElement = (tagname, attributes, ...content) => {
         }
     }
     if (content) {
-        if (typeof content === "string") {
-            element.textContent = content;
+        if (typeof content[0] === "string") {
+            element.textContent = content[0];
         }
         else {
             for (const child of content) {
@@ -91,20 +91,33 @@ class PostUI {
             for (let cat of res) {
                 if (![...select.childNodes]
                     .map(o => o.getAttribute("value"))
-                    .filter(v => v == cat.Id)
-                    .length) {
+                    .filter(v => v == cat.Id).length) {
                     select.appendChild(CreateElement("option", { value: cat.Id }, cat.Name));
                 }
             }
         });
     }
-    static RenderRating(parent, currentRating) {
+    static RenderRating(parent, postId, currentRating) {
+        const stars = new Array();
+        const ratingClick = e => {
+            const userRating = e.target.getAttribute("value");
+            API.GET("/api/rate.php", {
+                rating: e.target.getAttribute("value"),
+                postId: postId
+            });
+            stars
+                .filter(i => i.getAttribute("value") <= userRating)
+                .forEach(i => (i.className = "fas fa-star cursor-pointer"));
+            stars
+                .filter(i => i.getAttribute("value") > userRating)
+                .forEach(i => (i.className = "far fa-star cursor-pointer"));
+        };
         let i = 1;
         for (; i <= currentRating; i++) {
-            parent.appendChild(CreateElement("i", { class: "fas fa-star", value: i }));
+            stars.push(parent.appendChild(CreateElement("i", { class: "fas fa-star cursor-pointer", value: i, onclick: ratingClick })));
         }
         for (; i <= 5; i++) {
-            parent.appendChild(CreateElement("i", { class: "far fa-star", value: i }));
+            stars.push(parent.appendChild(CreateElement("i", { class: "far fa-star cursor-pointer", value: i, onclick: ratingClick })));
         }
     }
 }
@@ -114,8 +127,9 @@ class API {
             if (params) {
                 url += '?';
                 for (let key in params) {
-                    url += key + "=" + params[key];
+                    url += key + "=" + params[key] + "&";
                 }
+                url = url.substr(0, url.length - 1);
             }
             this.Request("GET", url, "", resolve, reject);
         });
