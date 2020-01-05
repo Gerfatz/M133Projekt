@@ -9,7 +9,5 @@
         public $UploadDate;
         public $FileName;
         public $Rating;
-
-        public $Comments;
     }
 ?>

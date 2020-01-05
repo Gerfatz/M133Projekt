@@ -20,6 +20,41 @@
             return $statement->fetchAll();
         }
 
+        public function GetComments(int $postId, int $userId):array
+        {
+            $args = array(
+                ":parentId" => $postId,
+                ":userId" => $userId
+            );
+            $sql = "SELECT post.Id AS Id, post.creatorId AS CreatorId, post.uploadDate AS UploadDate, post.fileName AS FileName, post.text AS Text, ( SELECT user.username FROM user WHERE post.creatorId = user.Id ) AS CreatorName, (SELECT rating.rating FROM rating WHERE PostId = post.Id AND UserId = :userId) AS Rating FROM post WHERE parentId = :parentId";
+            $statement = $this->db->PrepareQuery($sql);
+            $statement->setFetchMode(PDO::FETCH_CLASS, "CommentViewModel");
+            $statement->execute($args);
+            $model = $statement->fetchAll();
+
+            foreach ($model as $comment) {
+                $this->GetSubComments($comment, $userId, $statement);
+            }         
+            return $model;
+        }
+
+        public function GetSubComments(CommentViewModel &$comment, int $userId, &$statement){
+            $statement->execute(array(
+                ":parentId" => $comment->Id,
+                ":userId" => $userId
+            ));
+                
+            $res = $statement->fetchAll();
+
+            if($res){
+                $comment->Comments = $res;
+                foreach ($res as $subComment) {
+                    $this->GetSubComments($subComment, $userId, $statement);
+                }
+            }
+              
+        }
+
         public function SaveRating(int $userId, int $postId, int $rating)
         {
             $existsQuery = $this->db->Query("SELECT * FROM rating WHERE PostId = $postId AND UserId = $userId");
@@ -39,6 +74,30 @@
 
             $statement = $this->db->PrepareQuery($sql);
             $statement->execute($args);
+        }
+
+        public function SaveComment(array $model){
+            $sql = "";
+
+            if(!isset($model["Id"]) || $model["Id"] == 0){
+                $sql = "INSERT INTO post (creatorId, parentId, text) VALUES (:CreatorId, :ParentId, :Text)";
+                $statement = $this->db->PrepareQuery($sql);
+                $args = array(
+                    ":CreatorId" => $model["CreatorId"],
+                    ":ParentId" => $model["ParentId"],
+                    ":Text" => $model["Text"]
+                );
+                $statement->execute($args);
+            }
+            else{
+                $sql = "UPDATE post SET text = :Text WHERE Id = :Id";
+                $statement = $this->db->PrepareQuery($sql);
+                $args = array(
+                    ":Id" => $model["Id"],
+                    ":Text" => $model["Text"]
+                );
+                $statement->execute($args);
+            }
         }
 
         public function Save($model): PostViewModel{

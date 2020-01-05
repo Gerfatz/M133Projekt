@@ -42,6 +42,30 @@ const CreateElement = (tagname, attributes, ...content) => {
     }
     return element;
 };
+const markInputError = (input, message) => {
+    input.style.border = "solid 1px red";
+    input.setAttribute("title", message);
+};
+document.onkeyup = (e) => {
+    const inputs = document.querySelectorAll("input");
+    for (const input of inputs) {
+        if (input.type == "number") {
+            if (parseInt(input.value) == NaN) {
+                markInputError(input, "Eingabe muss eine Zahl sein");
+            }
+            if (input.hasAttribute("min") && input.value < input.getAttribute("min")) {
+                markInputError(input, "Die eingegebene Zahl ist zu klein");
+            }
+            if (input.hasAttribute("max") && input.value > input.getAttribute("max")) {
+                markInputError(input, "Die eingegebene Zahl ist zu gross");
+            }
+        }
+    }
+};
+const forms = document.querySelectorAll("form");
+for (const form of forms) {
+    form.onsubmit;
+}
 class CategoryUI {
     static renderCategory(parent, category, linkToCategory = false) {
         let title = parent.find("title");
@@ -120,6 +144,52 @@ class PostUI {
             stars.push(parent.appendChild(CreateElement("i", { class: "far fa-star cursor-pointer", value: i, onclick: ratingClick })));
         }
     }
+    static async RenderComments(container, postId) {
+        let res = await API.GET("/api/comment.php", { postId });
+        res = JSON.parse(res);
+        const renderEdit = (parent, parentId) => {
+            const edit = parent.appendChild(CreateElement("div", { class: "ml-1 mb-2" },
+                CreateElement("div", { class: "form-control-group mb-2" },
+                    CreateElement("label", { for: "text" }, "Text"),
+                    CreateElement("input", { class: "form-control", type: "text", id: "text", ref: "text" })),
+                CreateElement("button", { onclick: async () => {
+                        const input = edit.find("text").value;
+                        if (validateXSS(input)) {
+                            const model = new CommentViewModel();
+                            model.Text = input;
+                            model.ParentId = parentId;
+                            await API.POST("/api/comment.php", JSON.stringify(model));
+                            parent.removeChild(edit);
+                            renderComment(model, parent);
+                        }
+                    }, class: "btn btn-primary" }, "Kommentieren")));
+        };
+        container.appendChild(CreateElement("h5", { class: "ml-2" }, "Kommentare"));
+        renderEdit(container, postId);
+        const renderComment = (comment, parent) => {
+            const element = parent.appendChild(CreateElement("div", { class: "border-top border-left ml-2" },
+                CreateElement("p", null, comment.Text),
+                CreateElement("div", { class: "d-flex justify-content-around", ref: "comment-footer" })));
+            this.RenderRating(element.find("comment-footer").appendChild(CreateElement("span", { class: "text-warning" })), comment.Id, comment.Rating);
+            element.find("comment-footer").appendChild(CreateElement("span", { onclick: () => { renderEdit(element, comment.Id); } },
+                CreateElement("i", { class: "fa fa-reply" })));
+            if (comment.Comments) {
+                for (let child of comment.Comments) {
+                    renderComment(child, element);
+                }
+            }
+        };
+        for (const comment of res) {
+            renderComment(comment, container);
+        }
+        let icon = container.parentElement.find("comment-icon");
+        icon.className = "fa fa-times";
+        icon.parentElement.onclick = () => {
+            container.textContent = "";
+            icon.className = "fa fa-comment-alt";
+            icon.parentElement.onclick = () => { this.RenderComments(container, postId); };
+        };
+    }
 }
 class API {
     static GET(url, params = null) {
@@ -151,7 +221,7 @@ class API {
     }
     static Request(method, url, data, resolve, reject) {
         let request = new XMLHttpRequest();
-        request.open("POST", Config.baseUrl + url);
+        request.open(method, Config.baseUrl + url);
         request.onreadystatechange = () => {
             if (request.readyState == 4) {
                 if (request.status == 200) {
@@ -163,7 +233,7 @@ class API {
             }
         };
         request.onerror = () => { reject(Error(method + " Request failed because of an network error")); };
-        request.send(JSON.stringify(data));
+        request.send(data);
     }
 }
 class Login {
@@ -190,6 +260,8 @@ class Login {
     }
 }
 class Category {
+}
+class CommentViewModel {
 }
 if (!HTMLElement.prototype.find) {
     HTMLElement.prototype.find = function (ref) {

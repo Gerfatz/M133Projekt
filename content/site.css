@@ -5,6 +5,8 @@
 
 .cursor-pointer,
 .list-group-item-action,
-span[_onclick]{
+span[_onclick],
+span[onclick]
+{
     cursor: pointer;
 }

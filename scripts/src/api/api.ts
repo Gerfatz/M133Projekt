@@ -38,7 +38,7 @@ class API{
     private static Request(method: string, url: string, data: any, resolve: Function, reject: Function){
 
         let request = new XMLHttpRequest();
-        request.open("POST", Config.baseUrl + url);
+        request.open(method, Config.baseUrl + url);
 
         request.onreadystatechange = () => {
             if(request.readyState == 4){
@@ -53,6 +53,6 @@ class API{
 
         request.onerror = () => {reject(Error(method + " Request failed because of an network error"))}
         
-        request.send(JSON.stringify(data));
+        request.send(data);
     }
 }

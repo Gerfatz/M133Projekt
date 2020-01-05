@@ -3,8 +3,11 @@
         public $Id;
         public $CreatorId;
         public $CreatorName;
+        public $ParentId;
         public $UploadDate;
         public $Text;
-        public $PicturePath;
+        public $Rating;
+
+        public $Comments;
     }
 ?>

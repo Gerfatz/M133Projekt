@@ -22,5 +22,16 @@
                 PostUI.RenderRating(document.currentScript.parentElement, %Id% ,%Rating%)    
             </script>
         </span>
+        <span onclick="RenderComments(%Id%)">
+            <i ref="comment-icon" class="fa fa-comment-alt"></i>
+        </span>
+        <script>
+            function RenderComments(id){     
+                PostUI.RenderComments(document.getElementById('comments-section-' + id), id);
+            }
+        </script>
+    </div>
+    <div id="comments-section-%Id%">
+
     </div>
 </div>
