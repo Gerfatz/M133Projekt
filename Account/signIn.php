@@ -14,6 +14,12 @@
 
             if($user->passwordHash == $repo->HashPassword($_POST["password"])){
                 $_SESSION["UserId"] = $user->Id;
+                if($_POST["rememberUsername"]){
+                    setcookie("Username", $user->Username);
+                }
+                else{
+                    setcookie("Username", "", time()-60);
+                }
                 header("Location: " . GetConfigValue("url"));
             }
             else{

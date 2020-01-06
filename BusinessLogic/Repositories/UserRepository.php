@@ -28,12 +28,12 @@
         }
 
         public function GetUserByUsername(string $username): UserViewModel{
-            $statement = $this->db->Query("SELECT * FROM user WHERE username = '$username'");
+            $statement = $this->db->Query("SELECT Id AS Id, username AS Username, passwordHash AS PasswordHash FROM user WHERE username = '$username'");
             return $this->CreateUserFromStatement($statement);
         }
 
         public function GetUserById(int $id): UserViewModel{
-            $statement = $this->db->Query("SELECT * FROM user WHERE Id = $id");
+            $statement = $this->db->Query("SELECT Id AS Id, username AS Username, passwordHash AS PasswordHash FROM user WHERE Id = $id");
             return $this->CreateUserFromStatement($statement);
         }
 

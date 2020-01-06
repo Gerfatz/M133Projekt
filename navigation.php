@@ -15,7 +15,8 @@
 
             $partialData["AccountControl"] = GetPartial("_accountControl", array(
                 "userId" => $userId,
-                "username" => $repo->GetUserById($userId)->username
+                "username" => $repo->GetUserById($userId)->Username,
+                "url" => GetConfigValue("url")
             ));
         }
         else{

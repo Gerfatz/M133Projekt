@@ -3,6 +3,18 @@
     require_once(GetPath() . "partials.php");
     require_once(GetPath() . "header.php");
     require_once(GetPath() . "navigation.php");
+
+    $username = "";
+
+    if(isset($_GET["Username"])){
+        $username = $_GET["Username"];
+    }
+    
+    if(isset($_COOKIE["Username"])){
+        $username = $_COOKIE["Username"];
+    }
+
+
 ?>
 <!doctype html>
 <html>
@@ -47,18 +59,20 @@
                         <form action="signIn.php" method="post" id="loginform">
                             <div class="form-control-group">
                                 <label for="username">Benutzername</label>
-                                <input class="form-control mb-2" type="text" <?
-                                    if(array_key_exists("username", $_GET)){
-                                        $username = $_GET["username"];
+                                <input class="form-control mb-2" type="text"<?
                                         echo "value=\"$username\"";
-                                    }
-                                ?> name="username" ref="username"/>
+                                ?> name="username" id="username" ref="username"/>
                             </div>
                             
 
                             <div class="form-control-group"> 
                                 <label for="password">Passwort</label>
-                                <input class="form-control mb-2" type="password" name="password" ref="password"/>
+                                <input class="form-control mb-2" type="password" id="password" name="password" ref="password"/>
+                            </div>
+
+                            <div class="form-check mb-2">                                    
+                                <input class="form-check-input" type="checkbox" name="rememberUsername" id="remember-username"/>
+                                <label class="form-check-label" for="remember-username">Benutzername merken</label>
                             </div>
 
                             <button class="btn btn-primary" onclick="login.ValidateForm(document.getElementById('loginform'))">Login</button>

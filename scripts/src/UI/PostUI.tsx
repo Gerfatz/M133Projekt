@@ -5,6 +5,10 @@ class PostUI {
                 e.stopPropagation();
                 $("#create-post-modal").modal("show");
             };
+            document.body.find("modal-close-button").onclick = e =>{
+                e.stopPropagation();
+                $("#create-post-modal").modal("hide");
+            }
         } else {
             trigger.onclick = () => {
                 alert("Es kann nur in abonnierten Kategorien gepostet werden");

@@ -20,6 +20,16 @@
             return $statement->fetchAll();
         }
 
+        public function GetPostsFromUser(int $userToViewId, int $currentUserId)
+        {
+            $sql = "SELECT post.Id AS Id, post.title AS Title, post.categoryId AS CategoryId, post.creatorId AS CreatorId, post.uploadDate AS UploadDate, post.fileName AS FileName, ( SELECT category.name FROM category WHERE post.categoryId = category.Id ) AS CategoryName, ( SELECT user.username FROM user WHERE post.creatorId = user.Id ) AS CreatorName, (SELECT rating.rating FROM rating WHERE PostId = post.Id AND UserId = :cuserId) AS Rating FROM post WHERE creatorId = :userId";
+            $sql = str_replace(":cuserId", $currentUserId, $sql);
+            $sql = str_replace(":userId", $userToViewId, $sql);
+            $statement = $this->db->Query($sql);
+            $statement->setFetchMode(PDO::FETCH_CLASS, "PostViewModel");
+            return $statement->fetchAll();
+        }
+
         public function GetComments(int $postId, int $userId):array
         {
             $args = array(
