@@ -51,7 +51,7 @@ CREATE TABLE `post` (
   `uploadDate` datetime NOT NULL DEFAULT current_timestamp(),
   `title` varchar(100) NOT NULL,
   `text` varchar(1024) DEFAULT NULL,
-  `picturePath` varchar(256) DEFAULT NULL
+  `fileName` varchar(256) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
