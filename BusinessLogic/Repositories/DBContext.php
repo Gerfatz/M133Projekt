@@ -15,5 +15,17 @@
         public function Query(string $sql): PDOStatement{
             return $this->dbo->query($sql);
         }
+
+        public function Exists(string $tableName, $value, string $key = "Id"): bool{
+            $statement = $this->PrepareQuery("SELECT COUNT(:key) FROM :table WHERE :key = :value");
+            $args = array(
+                ":table" => $tableName,
+                ":key" => $key,
+                ":value" => $value
+            );
+
+            $statement->execute($args);
+            return $statement->fetch() != 0;
+        }
     }
 ?>

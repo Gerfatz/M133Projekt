@@ -2,6 +2,7 @@
     require_once(GetPath() . "BusinessLogic/Repositories/DBContext.php");
     require_once(GetPath() . "BusinessLogic/Repositories/RepositoryBase.php");
     require_once(GetPath() . "BusinessLogic/ViewModels/CategoryViewModel.php");
+    require_once(GetPath() . "Validation.php");
 
     class CategoryRepository extends RepositoryBase{
         private $baseSQL = "SELECT category.Id AS Id, category.name AS Name, category.description AS Description, ( SELECT 1 FROM subscription WHERE subscription.CategoryId = category.Id AND subscription.UserId = :userId ) AS Subscribed, ( SELECT 1 FROM user WHERE user.Id = :userId AND user.Id = category.ownerId ) AS IsOwner FROM category";
@@ -61,6 +62,10 @@
 
         public function CreateNewCategory(string $name, int $userId, string $description = ""): CategoryViewModel
         {
+            if($this->db->Exists("category", $name, "name")){
+                Validator.AddError("name", "Dieser Name wird bereits benutzt", $name);
+            }
+
             $category = new CategoryViewModel();
             $category->name = $name;
             $category->description = $description;
