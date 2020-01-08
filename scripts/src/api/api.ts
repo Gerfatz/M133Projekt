@@ -52,7 +52,7 @@ class API{
         }
 
         request.onerror = () => {reject(Error(method + " Request failed because of an network error"))}
-        
-        request.send(data);
+
+        request.send(JSON.stringify(data));
     }
 }

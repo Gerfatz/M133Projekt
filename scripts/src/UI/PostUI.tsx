@@ -112,10 +112,10 @@ class PostUI {
                         model.Text = input;
                         model.ParentId = parentId;
 
-                        await API.POST("/api/comment.php", JSON.stringify(model));
+                        await API.POST("/api/comment.php", model);
 
-                        parent.removeChild(edit);
-                        renderComment(model, parent);
+                        container.textContent = "";
+                        this.RenderComments(container, postId);
                     }
                 }} class="btn btn-primary">Kommentieren</button>
             </div>);

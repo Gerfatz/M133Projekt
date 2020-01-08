@@ -1,0 +1,56 @@
+Erklärung der Architektur:
+
+Im Basisverzeichnis (xampp/htdocs/*/) finden sich generelle Scripts, wie die Startseite Index.php, sowie Scripts, welche 
+Allgemeine Funktionen enthalten, die z.B. nicht angemeldete Benutzer auf die Login-Seite weiter leiten, oder die
+Navigation der Seite rendern. Auch die Konfigurationsdatei config.json ist in diesem Verzeichnis.
+
+Ebenfalls in diesem Verzeichnis ist die Datei partials.php. Sie beinhaltet eine Funktion, welche den Inhalt einer HTML Datei ausliest,
+und in %% geschriebene Werte ersetzt. Die Ersetzungen erhält die Funktion über den 2.Parameter, welcher ein array annimmt.
+Die Keys dieses array entsprechen den zu ersetzenden Werten, und die Values dem string der Eingefügt wird.
+
+Beispiel:
+    HTML:
+        <title>%title%</title>
+    
+    Aufruf:
+        GetPartial("_title", array("title"=>"Hallo Welt"));
+
+    Resultat:
+        <title>Hallo Welt</title>
+
+Das Verzechnis content beinhaltet die css Dateien, fontawesome die Icon-Library, und scripts die JavaScript/TypeScript Dateien.
+Die Librarys wie Bootstrap und JQuery sind Lokal gespeichert, da so eine Entwicklung ohne Internet zugang erleichtert wird.
+(Ich war über Weihnachten in Österreich, wo ich kein Internet hatte)
+
+Die JavaScript Entwicklung wurde durch TypeScript erleichtert, dies ermöglicht Ebenfalls ein leichteres nachvollziehen des Codes.
+Die Selbst geschriebenen Files sind in Scripts/src zu finden.
+
+React.js wird zwar nicht verwendet, jedoch die von React bekannte jsx syntax (HTML im JavaScript). Die Funktion die die Elemente
+erstellt heisst CreateElement und ist im File main.ts zu finden.
+
+Für die einzelnen Bereiche der Webseite (Posts, Kategorien ...) sind Unterverzeichnisse mit entspechenden Name angelegt.
+Sie enhalten die PHP-Scripts, welche vom Client aufgerufen werden, greifen aber nicht direkt auf die Datenbank zu, dies geschieht in
+den Scripts im BusinessLogic Verzeichnis. 
+
+Die BusinessLogic ist in Repositorys und ViewModels aufgeteilt. Repositorys fragen die Daten ab, legen neue Einträge in der Datenbank und, 
+verändern und löschen diese wieder. Zudem Validieren sie die Daten. ViewModels dienen zum Transfer der Daten zwischen der BusinessLogic 
+und den aufrufenden Scripts, sie enhalten selbst keine Logik.
+
+Im api Verzeichnis finden sich ebenfalls PHP-Scripts, welche es dem Client ermöglichen bestimmte Aktionen (z.B. Kommentieren und Bewerten)
+auszuführen, ohne die Seite neuladen zu müssen.
+
+Der Server validiert die Daten auf seiner Seite, und wird falls eine Fehler gefunden wurde den Benutzer wieder auf die Seite zurückleiten.
+Im Header wird jedoch ein JavaScript Objekt erstellt, welches informationen zum Fehler enthält. Diese werden dann in das Form eingefügt,
+um dem Benutzer nützliches Feedback zu geben.
+
+Wichtige Scripts in diesem Prozess sind validation.php, welche die Fehlerliste verwaltet und diese am ende zu JSON konvertiert.
+
+
+
+/**********************************************************************************************************************************************/
+/**********************************************      Beispiel      ****************************************************************************/
+/**********************************************************************************************************************************************/
+
+Beim Erstellen eines Post wird das Scripts Post/create.php aufgerufen. Diese liest zuerst das Bild aus, generiert eine GUID für den Namen der
+Datei auf dem Server. Es wird anschliesend im Verzeichnis Images/{Kategorie}/ abgespeichert. Anschliessend werden die aktuelle Benutzer Id
+(Creator), Kategorie und Dateiname an das PostRepository übergeben, welches den Post in der Datenbank ablegt.

@@ -4,7 +4,7 @@
     require_once("../functions.php");
     require_once(GetPath() . "BusinessLogic/ViewModels/CommentViewModel.php");
     require_once(GetPath() . "BusinessLogic/Repositories/PostRepository.php");
-    require_once(GetPath() . "Security.php");
+    require_once(GetPath() . "security.php");
 
     $repo = new PostRepository();
     $userId = 0;

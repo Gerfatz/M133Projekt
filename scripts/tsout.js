@@ -42,51 +42,48 @@ const CreateElement = (tagname, attributes, ...content) => {
     }
     return element;
 };
-const markInputError = (input, message) => {
-    input.style.border = "solid 1px red";
-    input.setAttribute("title", message);
-};
-document.onkeyup = (e) => {
-    const inputs = document.querySelectorAll("input");
-    for (const input of inputs) {
-        if (input.type == "number") {
-            if (parseInt(input.value) == NaN) {
-                markInputError(input, "Eingabe muss eine Zahl sein");
-            }
-            if (input.hasAttribute("min") && input.value < input.getAttribute("min")) {
-                markInputError(input, "Die eingegebene Zahl ist zu klein");
-            }
-            if (input.hasAttribute("max") && input.value > input.getAttribute("max")) {
-                markInputError(input, "Die eingegebene Zahl ist zu gross");
-            }
-        }
+class Validator {
+    static Create(models) {
+        this.ErrorModels = models;
     }
-};
-const forms = document.querySelectorAll("form");
-for (const form of forms) {
-    form.onsubmit;
+}
+class ErrorModel {
 }
 class CategoryUI {
     static renderCategory(parent, category, linkToCategory = false) {
         let title = parent.find("title");
-        let span = title.appendChild(CreateElement("span", { class: "float-right", title: category.Subscribed ? "Deabonnieren" : "Abonnieren", onclick: (e) => {
-                e.stopPropagation();
-                let icon = e.target.firstChildElement;
-                icon.className = "fa fa-spin fa-sync";
-                span.title = category.Subscribed ? "Deabonnieren" : "Abonnieren";
-                API.POST("/api/subscribe.php", { categoryId: category.Id }).then((res) => {
-                    icon.className = parseInt(res) ? "fa fa-times text-danger" : "fa fa-bell text-primary";
-                    category.Subscribed = res === "1";
+        const subscribeAction = (e) => {
+            e.stopPropagation();
+            let icon = e.target;
+            icon.className = "fa fa-spin fa-sync";
+            span.title = category.Subscribed ? "Deabonnieren" : "Abonnieren";
+            API.POST("/api/subscribe.php", {
+                categoryId: category.Id
+            }).then((res) => {
+                icon.className = parseInt(res)
+                    ? "fa fa-times text-danger"
+                    : "fa fa-bell text-primary";
+                category.Subscribed = res === "1";
+                if (!linkToCategory) {
                     PostUI.RegisterCreatePostModal(document.body.find("create-post"), category);
-                });
-            } },
-            CreateElement("i", { class: category.Subscribed ? "fa fa-times text-danger" : "fa fa-bell text-primary" })));
+                }
+            });
+        };
+        let span = title.appendChild(CreateElement("span", { class: "float-right", title: category.Subscribed ? "Deabonnieren" : "Abonnieren", onclick: subscribeAction },
+            CreateElement("i", { class: category.Subscribed
+                    ? "fa fa-times text-danger"
+                    : "fa fa-bell text-primary" })));
         if (linkToCategory) {
             parent.onclick = () => {
-                location.href = Config.baseUrl + "/Kategorien/details.php?categoryId=" + category.Id;
+                location.href =
+                    Config.baseUrl +
+                        "/Kategorien/details.php?categoryId=" +
+                        category.Id;
             };
         }
-        PostUI.RegisterCreatePostModal(document.body.find("create-post"), category);
+        else {
+            PostUI.RegisterCreatePostModal(document.body.find("create-post"), category);
+        }
     }
 }
 class PostUI {
@@ -162,9 +159,9 @@ class PostUI {
                             const model = new CommentViewModel();
                             model.Text = input;
                             model.ParentId = parentId;
-                            await API.POST("/api/comment.php", JSON.stringify(model));
-                            parent.removeChild(edit);
-                            renderComment(model, parent);
+                            await API.POST("/api/comment.php", model);
+                            container.textContent = "";
+                            this.RenderComments(container, postId);
                         }
                     }, class: "btn btn-primary" }, "Kommentieren")));
         };
@@ -237,7 +234,7 @@ class API {
             }
         };
         request.onerror = () => { reject(Error(method + " Request failed because of an network error")); };
-        request.send(data);
+        request.send(JSON.stringify(data));
     }
 }
 class Login {

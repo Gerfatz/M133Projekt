@@ -15,6 +15,9 @@
         }
 
         public static function GetJSON(): string{
+            if(!isset($ErrorModel)){
+                return "[]";
+            }
             return json_encode($ErrorModel);
         }
     }

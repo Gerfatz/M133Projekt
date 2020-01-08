@@ -12,7 +12,9 @@
             $sql = str_replace(":userId", $userId, $this->baseSQL);
             $statement = $this->db->Query($sql);
             $statement->setFetchMode(PDO::FETCH_CLASS, "CategoryViewModel");
-            return $statement->fetchAll();
+            $res = $statement->fetchAll();
+            $this->EscapeString($res);
+            return $res;
         }
 
         public function GetSubscribedCategories(int $userId):array{

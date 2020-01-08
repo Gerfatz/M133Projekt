@@ -12,7 +12,7 @@
         }
 
         public function GetAllPostsFromCategory(int $categoryId, int $userId = 0): array{
-            $sql = "SELECT post.Id AS Id, post.title AS Title, post.categoryId AS CategoryId, post.creatorId AS CreatorId, post.uploadDate AS UploadDate, post.fileName AS FileName, ( SELECT category.name FROM category WHERE post.categoryId = category.Id ) AS CategoryName, ( SELECT user.username FROM user WHERE post.creatorId = user.Id ) AS CreatorName, (SELECT rating.rating FROM rating WHERE PostId = post.Id AND UserId = :userId) AS Rating FROM post WHERE categoryId = :categoryId";
+            $sql = "SELECT post.Id AS Id, post.title AS Title, post.categoryId AS CategoryId, post.creatorId AS CreatorId, post.uploadDate AS UploadDate, post.fileName AS FileName, ( SELECT category.name FROM category WHERE post.categoryId = category.Id ) AS CategoryName, ( SELECT user.username FROM user WHERE post.creatorId = user.Id ) AS CreatorName, (SELECT rating.rating FROM rating WHERE PostId = post.Id AND UserId = :userId) AS Rating, (SELECT AVG(rating.rating) FROM rating WHERE rating.PostId = post.Id) AS Score FROM post WHERE categoryId = :categoryId ORDER BY Score DESC";
             $sql = str_replace(":categoryId", $categoryId, $sql);
             $sql = str_replace(":userId", $userId, $sql);
             $statement = $this->db->Query($sql);
@@ -22,7 +22,7 @@
 
         public function GetPostsFromUser(int $userToViewId, int $currentUserId)
         {
-            $sql = "SELECT post.Id AS Id, post.title AS Title, post.categoryId AS CategoryId, post.creatorId AS CreatorId, post.uploadDate AS UploadDate, post.fileName AS FileName, ( SELECT category.name FROM category WHERE post.categoryId = category.Id ) AS CategoryName, ( SELECT user.username FROM user WHERE post.creatorId = user.Id ) AS CreatorName, (SELECT rating.rating FROM rating WHERE PostId = post.Id AND UserId = :cuserId) AS Rating FROM post WHERE creatorId = :userId";
+            $sql = "SELECT post.Id AS Id, post.title AS Title, post.categoryId AS CategoryId, post.creatorId AS CreatorId, post.uploadDate AS UploadDate, post.fileName AS FileName, ( SELECT category.name FROM category WHERE post.categoryId = category.Id ) AS CategoryName, ( SELECT user.username FROM user WHERE post.creatorId = user.Id ) AS CreatorName, (SELECT rating.rating FROM rating WHERE PostId = post.Id AND UserId = :cuserId) AS Rating, (SELECT AVG(rating.rating) FROM rating WHERE rating.PostId = post.Id) AS Score FROM post WHERE creatorId = :userId AND parentId IS NULL ORDER BY Score DESC";
             $sql = str_replace(":cuserId", $currentUserId, $sql);
             $sql = str_replace(":userId", $userToViewId, $sql);
             $statement = $this->db->Query($sql);
@@ -36,7 +36,7 @@
                 ":parentId" => $postId,
                 ":userId" => $userId
             );
-            $sql = "SELECT post.Id AS Id, post.creatorId AS CreatorId, post.uploadDate AS UploadDate, post.fileName AS FileName, post.text AS Text, ( SELECT user.username FROM user WHERE post.creatorId = user.Id ) AS CreatorName, (SELECT rating.rating FROM rating WHERE PostId = post.Id AND UserId = :userId) AS Rating FROM post WHERE parentId = :parentId";
+            $sql = "SELECT post.Id AS Id, post.creatorId AS CreatorId, post.uploadDate AS UploadDate, post.fileName AS FileName, post.text AS Text, ( SELECT user.username FROM user WHERE post.creatorId = user.Id ) AS CreatorName, (SELECT rating.rating FROM rating WHERE PostId = post.Id AND UserId = :userId) AS Rating, (SELECT AVG(rating.rating) FROM rating WHERE rating.PostId = post.Id) AS Score FROM post WHERE parentId = :parentId ORDER BY Score DESC";
             $statement = $this->db->PrepareQuery($sql);
             $statement->setFetchMode(PDO::FETCH_CLASS, "CommentViewModel");
             $statement->execute($args);

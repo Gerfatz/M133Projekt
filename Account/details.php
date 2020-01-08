@@ -52,7 +52,7 @@
                 foreach ($posts as $post) {
                     $data = (array)$post;
                     $data["url"] = GetConfigValue("url");
-                    echo "<div class=\"col-md-8\">" . GetPartial("_Post", $data) . "</div>";
+                    echo "<div class=\"col-md-8\">" . GetPartial("_post", $data) . "</div>";
                 }
             ?>
         </div>
