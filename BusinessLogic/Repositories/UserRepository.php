@@ -38,9 +38,7 @@
         }
 
         public Function IsUsernameAvailable($username): bool{
-            $statement = $this->db->Query("SELECT username FROM user WHERE username = '$username'");
-            $numOfRows = $statement->rowCount();
-            return $numOfRows == 0;
+            return !$this->db->Exists("user", $username, "username");
         }
 
         public function CreateUserFromStatement(PDOStatement $statement): UserViewModel

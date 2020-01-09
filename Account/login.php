@@ -5,10 +5,6 @@
     require_once(GetPath() . "navigation.php");
 
     $username = "";
-
-    if(isset($_GET["Username"])){
-        $username = $_GET["Username"];
-    }
     
     if(isset($_COOKIE["Username"])){
         $username = $_COOKIE["Username"];
@@ -34,24 +30,6 @@
 
         <div class="row d-flex justify-content-center mt-2">
             <div class="col-6">
-                <?
-                    if(isset($_GET["message"])){
-                        ?>
-                            <span class="alert alert-warning">
-                        <?
-                        if($_GET["message"] == 1)
-                        {
-                            echo "Es wurde kein Benutzer mit diesem Benutzername gefunden";
-                        }
-                        else if ($_GET["message"] == 2)
-                        {
-                            echo "Das angegebene Passwort ist falsch";
-                        }
-                        ?>
-                            </span>
-                        <?
-                    }
-                ?>
                 <div class="card">
                     <div class="card-body">
                         <h4 class="card-title">Login</h4>
@@ -71,7 +49,7 @@
                             </div>
 
                             <div class="form-check mb-2">                                    
-                                <input class="form-check-input" type="checkbox" name="rememberUsername" id="remember-username"/>
+                                <input class="form-check-input" <?echo $username == "" ? "" : "checked"?> type="checkbox" name="rememberUsername" id="remember-username"/>
                                 <label class="form-check-label" for="remember-username">Benutzername merken</label>
                             </div>
 

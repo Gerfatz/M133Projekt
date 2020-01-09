@@ -44,7 +44,21 @@ const CreateElement = (tagname, attributes, ...content) => {
 };
 class Validator {
     static Create(models) {
-        this.ErrorModels = models;
+        document.onreadystatechange = () => {
+            if (document.readyState == "complete") {
+                const inputs = document.querySelectorAll("input");
+                models.forEach(error => {
+                    const element = [...inputs].filter(i => i.name == error.name)[0];
+                    element.classList.add("is-invalid");
+                    if (error.message) {
+                        element.parentElement.appendChild(CreateElement("div", { class: "invalid-feedback" }, error.message));
+                    }
+                    if (error.value) {
+                        element.value = error.value;
+                    }
+                });
+            }
+        };
     }
 }
 class ErrorModel {

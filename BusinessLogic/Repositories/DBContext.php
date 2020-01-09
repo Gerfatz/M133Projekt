@@ -17,15 +17,13 @@
         }
 
         public function Exists(string $tableName, $value, string $key = "Id"): bool{
-            $statement = $this->PrepareQuery("SELECT COUNT(:key) FROM :table WHERE :key = :value");
+            $statement = $this->PrepareQuery("SELECT COUNT($key) AS count FROM $tableName WHERE $key = :value");
             $args = array(
-                ":table" => $tableName,
-                ":key" => $key,
                 ":value" => $value
             );
 
             $statement->execute($args);
-            return $statement->fetch() != 0;
+            return $statement->fetch()["count"] != 0;
         }
     }
 ?>
