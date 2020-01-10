@@ -1,18 +1,3 @@
-const validateSearch = (elementId) => {
-    let element = document.getElementById(elementId);
-    if (validateXSS(element.value)) {
-        element.value = validateSQL(element.value);
-        return true;
-    }
-    alert("Possible XSS detected");
-    return false;
-};
-const validateXSS = (input) => {
-    return (input.match(/(\b)(on\S+)(\s*)=|javascript|(<\s*)(\/*)script/gi) == null);
-};
-const validateSQL = (input) => {
-    return input.match(/(^[a-zA-Z0-9])+/g).join();
-};
 class Config {
 }
 const CreateElement = (tagname, attributes, ...content) => {
