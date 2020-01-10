@@ -120,19 +120,19 @@ class PostUI {
                 </div>
                 <button ref="comment-button" onclick={async () => {
                     const input = edit.find("text").value;
-                    if(validateXSS(input)){
-                        const model = new CommentViewModel();
-                        model.Text = input;
-                        model.ParentId = parentId;
-                        try{
-                            await API.POST("/api/comment.php", model);
-                            container.textContent = "";
-                            this.RenderComments(container, postId);
-                        }
-                        catch{
-                            edit.appendChild(<p class="text-danger">Sie sind nicht eingeloggt</p>)
-                        }
+                    const model = new CommentViewModel();
+                    model.Text = input;
+                    model.ParentId = parentId;
+                    
+                    try{
+                        await API.POST("/api/comment.php", model);
+                        container.textContent = "";
+                        this.RenderComments(container, postId);
                     }
+                    catch{
+                        edit.appendChild(<p class="text-danger">Sie sind nicht eingeloggt</p>)
+                    }
+                    
                 }} class="btn btn-primary">Kommentieren</button>
             </div>);
             }

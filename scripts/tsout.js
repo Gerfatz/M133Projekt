@@ -165,18 +165,16 @@ class PostUI {
                         CreateElement("input", { class: "form-control", type: "text", id: "text", ref: "text" })),
                     CreateElement("button", { ref: "comment-button", onclick: async () => {
                             const input = edit.find("text").value;
-                            if (validateXSS(input)) {
-                                const model = new CommentViewModel();
-                                model.Text = input;
-                                model.ParentId = parentId;
-                                try {
-                                    await API.POST("/api/comment.php", model);
-                                    container.textContent = "";
-                                    this.RenderComments(container, postId);
-                                }
-                                catch {
-                                    edit.appendChild(CreateElement("p", { class: "text-danger" }, "Sie sind nicht eingeloggt"));
-                                }
+                            const model = new CommentViewModel();
+                            model.Text = input;
+                            model.ParentId = parentId;
+                            try {
+                                await API.POST("/api/comment.php", model);
+                                container.textContent = "";
+                                this.RenderComments(container, postId);
+                            }
+                            catch {
+                                edit.appendChild(CreateElement("p", { class: "text-danger" }, "Sie sind nicht eingeloggt"));
                             }
                         }, class: "btn btn-primary" }, "Kommentieren")));
             }
