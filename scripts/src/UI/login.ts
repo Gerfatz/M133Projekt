@@ -1,13 +1,8 @@
 class Login{
-
-    ValidateForm(loginForm: HTMLFormElement){
-        loginForm.submit();
-    }
-
     ValidateUsername(username: HTMLInputElement){
         let name = username.value
 
-        if(name && validateXSS(name) && name.match(/([A-Za-z0-9_]){0,}\w+/g).join("").length == name.length){
+        if(name){
             
             let spinner = username.parentElement.find("username-check");
 

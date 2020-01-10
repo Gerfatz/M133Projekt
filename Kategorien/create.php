@@ -8,13 +8,17 @@
     require_once(GetPath() . "navigation.php");
     require_once(GetPath() . "security.php");
     require_once(GetPath() . "configuration.php");
+    require_once(GetPath() . "validation.php");
 
     RerouteUnauthenticated();
 
     if(array_key_exists("name", $_POST) && array_key_exists("description", $_POST) && isset($_SESSION["UserId"])){
         $repo = new CategoryRepository();
         $category = $repo->CreateNewCategory($_POST["name"], $_SESSION["UserId"], $_POST["description"]);
-        header("location:" . GetConfigValue("url") . "/Kategorien/details.php?categoryId=". $category->Id);
+        
+        if(!Validator::HasErrors()){
+            header("location:" . GetConfigValue("url") . "/Kategorien/details.php?categoryId=". $category->Id);
+        }
     }
 ?>
 <!doctype html>

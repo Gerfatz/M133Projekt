@@ -46,9 +46,9 @@ class Validator {
     static Create(models) {
         document.onreadystatechange = () => {
             if (document.readyState == "complete") {
-                const inputs = document.querySelectorAll("input");
+                const inputs = [...document.querySelectorAll("input, textarea")];
                 models.forEach(error => {
-                    const element = [...inputs].filter(i => i.name == error.name)[0];
+                    const element = inputs.filter(i => i.name == error.name)[0];
                     element.classList.add("is-invalid");
                     if (error.message) {
                         element.parentElement.appendChild(CreateElement("div", { class: "invalid-feedback" }, error.message));
@@ -138,18 +138,28 @@ class PostUI {
     }
     static RenderRating(parent, postId, currentRating) {
         const stars = new Array();
-        const ratingClick = e => {
-            const userRating = e.target.getAttribute("value");
-            API.GET("/api/rate.php", {
-                rating: e.target.getAttribute("value"),
-                postId: postId
-            });
-            stars
-                .filter(i => i.getAttribute("value") <= userRating)
-                .forEach(i => (i.className = "fas fa-star cursor-pointer"));
-            stars
-                .filter(i => i.getAttribute("value") > userRating)
-                .forEach(i => (i.className = "far fa-star cursor-pointer"));
+        const ratingClick = async (e) => {
+            if (Config.isLoggedIn) {
+                const userRating = e.target.getAttribute("value");
+                try {
+                    await API.GET("/api/rate.php", {
+                        rating: e.target.getAttribute("value"),
+                        postId: postId
+                    });
+                }
+                catch {
+                    parent.appendChild(CreateElement("p", { class: "text-danger" }, "Sie sind nicht eingeloggt"));
+                }
+                stars
+                    .filter(i => i.getAttribute("value") <= userRating)
+                    .forEach(i => (i.className = "fas fa-star cursor-pointer"));
+                stars
+                    .filter(i => i.getAttribute("value") > userRating)
+                    .forEach(i => (i.className = "far fa-star cursor-pointer"));
+            }
+            else {
+                location.href = Config.baseUrl + "/Account/login.php";
+            }
         };
         let i = 1;
         for (; i <= currentRating; i++) {
@@ -163,21 +173,28 @@ class PostUI {
         let res = await API.GET("/api/comment.php", { postId });
         res = JSON.parse(res);
         const renderEdit = (parent, parentId) => {
-            const edit = parent.appendChild(CreateElement("div", { class: "ml-1 mb-2" },
-                CreateElement("div", { class: "form-control-group mb-2" },
-                    CreateElement("label", { for: "text" }, "Text"),
-                    CreateElement("input", { class: "form-control", type: "text", id: "text", ref: "text" })),
-                CreateElement("button", { onclick: async () => {
-                        const input = edit.find("text").value;
-                        if (validateXSS(input)) {
-                            const model = new CommentViewModel();
-                            model.Text = input;
-                            model.ParentId = parentId;
-                            await API.POST("/api/comment.php", model);
-                            container.textContent = "";
-                            this.RenderComments(container, postId);
-                        }
-                    }, class: "btn btn-primary" }, "Kommentieren")));
+            if (Config.isLoggedIn) {
+                const edit = parent.appendChild(CreateElement("div", { class: "ml-1 mb-2" },
+                    CreateElement("div", { class: "form-control-group mb-2" },
+                        CreateElement("label", { for: "text" }, "Text"),
+                        CreateElement("input", { class: "form-control", type: "text", id: "text", ref: "text" })),
+                    CreateElement("button", { ref: "comment-button", onclick: async () => {
+                            const input = edit.find("text").value;
+                            if (validateXSS(input)) {
+                                const model = new CommentViewModel();
+                                model.Text = input;
+                                model.ParentId = parentId;
+                                try {
+                                    await API.POST("/api/comment.php", model);
+                                    container.textContent = "";
+                                    this.RenderComments(container, postId);
+                                }
+                                catch {
+                                    edit.appendChild(CreateElement("p", { class: "text-danger" }, "Sie sind nicht eingeloggt"));
+                                }
+                            }
+                        }, class: "btn btn-primary" }, "Kommentieren")));
+            }
         };
         container.appendChild(CreateElement("h5", { class: "ml-2" }, "Kommentare"));
         renderEdit(container, postId);
@@ -204,6 +221,26 @@ class PostUI {
             icon.className = "fa fa-comment-alt";
             icon.parentElement.onclick = () => { this.RenderComments(container, postId); };
         };
+    }
+}
+class Login {
+    ValidateUsername(username) {
+        let name = username.value;
+        if (name) {
+            let spinner = username.parentElement.find("username-check");
+            spinner.className = "fa fa-spin fa-sync";
+            API.GET("/api/checkUsernameAvailability.php", { "username": name })
+                .then((res) => {
+                if (JSON.parse(res)) {
+                    spinner.className = "fa fa-check";
+                    spinner.removeAttribute("title");
+                }
+                else {
+                    spinner.className = "fa fa-times";
+                    spinner.setAttribute("title", "Dieser Benutzername ist nicht verfügbar");
+                }
+            });
+        }
     }
 }
 class API {
@@ -249,29 +286,6 @@ class API {
         };
         request.onerror = () => { reject(Error(method + " Request failed because of an network error")); };
         request.send(JSON.stringify(data));
-    }
-}
-class Login {
-    ValidateForm(loginForm) {
-        loginForm.submit();
-    }
-    ValidateUsername(username) {
-        let name = username.value;
-        if (name && validateXSS(name) && name.match(/([A-Za-z0-9_]){0,}\w+/g).join("").length == name.length) {
-            let spinner = username.parentElement.find("username-check");
-            spinner.className = "fa fa-spin fa-sync";
-            API.GET("/api/checkUsernameAvailability.php", { "username": name })
-                .then((res) => {
-                if (JSON.parse(res)) {
-                    spinner.className = "fa fa-check";
-                    spinner.removeAttribute("title");
-                }
-                else {
-                    spinner.className = "fa fa-times";
-                    spinner.setAttribute("title", "Dieser Benutzername ist nicht verfügbar");
-                }
-            });
-        }
     }
 }
 class Category {

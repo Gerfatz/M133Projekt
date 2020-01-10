@@ -25,8 +25,9 @@
         }
 
         public function GetCategoryByName(string $name, int $userId): CategoryViewModel{  
-            $sql = str_replace(":userId", $userId, $this->baseSQL) . " WHERE name = '$name'";
-            $statement = $this->db->Query($sql);
+            $sql = str_replace(":userId", $userId, $this->baseSQL) . " WHERE name = :name";
+            $statement = $this->db->PrepareQuery($sql);
+            $statement->execute(array(":name" => $name));
             $statement->setFetchMode(PDO::FETCH_CLASS, "CategoryViewModel");
             return $statement->fetch();
         }
@@ -62,26 +63,38 @@
             $statement->execute($args);
         }
 
-        public function CreateNewCategory(string $name, int $userId, string $description = ""): CategoryViewModel
+        public function CreateNewCategory(string $name, int $userId, string $description = "")
         {
             if($this->db->Exists("category", $name, "name")){
-                Validator.AddError("name", "Dieser Name wird bereits benutzt", $name);
+                Validator::AddError("name", "Dieser Name wird bereits benutzt", $name);
+            }
+            else if(strpos($name, '/') != false){
+                Validator::AddError("name", "Der Name enthält nicht erlaubte Zeichen");
+            }
+            else if(strpos($name, "'") != false){
+                Validator::AddError("name", "Der Name enthält nicht erlaubte Zeichen");
+            }
+            else if(strpos($description, "'") != false){
+                Validator::AddError("description", "Die Beschreibung enthält nicht erlaubte Zeichen");
+            }
+            else{
+                $category = new CategoryViewModel();
+                $category->name = $name;
+                $category->description = $description;
+                $category->ownerId = $userId;
+
+                mkdir(GetPath() . "Images/" . $name);
+
+                $this->Save($category);
+                return $this->GetCategoryByName($name, $userId);
             }
 
-            $category = new CategoryViewModel();
-            $category->name = $name;
-            $category->description = $description;
-            $category->ownerId = $userId;
 
-            mkdir(GetPath() . "Images/" . $name);
-
-            $this->Save($category);
-            return $this->GetCategoryByName($name, $userId);
         }
 
         public function Save($category){
             $sql = "";
-
+            $this->EscapeString($category);
             $args = array(
                 ":name" => $category->name,
                 ":description" => $category->description,

@@ -3,10 +3,11 @@
     require_once(GetPath() . "BusinessLogic/Repositories/DBContext.php");
     require_once(GetPath() . "BusinessLogic/ViewModels/UserViewModel.php");
     require_once(GetPath() . "BusinessLogic/Repositories/RepositoryBase.php");
+    require_once(GetPath() . "validation.php");
 
     class UserRepository extends RepositoryBase{
 
-        public function CreateNewUser(string $username, string $password): UserViewModel{
+        public function CreateNewUser(string $username, string $password){
             $user = new UserViewModel();
 
             if($this->IsUsernameAvailable($username)){
@@ -18,7 +19,7 @@
                 return $this->GetUserByUsername($username);
             }
             else{
-                return null;
+                Validator::AddError("username", "Dieser Benutzername ist bereits vergeben", $username);
             }
 
         }
@@ -28,7 +29,9 @@
         }
 
         public function GetUserByUsername(string $username): UserViewModel{
-            $statement = $this->db->Query("SELECT Id AS Id, username AS Username, passwordHash AS PasswordHash FROM user WHERE username = '$username'");
+            $this->EscapeString($username);
+            $statement = $this->db->PrepareQuery("SELECT Id AS Id, username AS Username, passwordHash AS PasswordHash FROM user WHERE username = :username");
+            $statement->execute(array(":username" => $username));
             return $this->CreateUserFromStatement($statement);
         }
 
@@ -38,6 +41,7 @@
         }
 
         public Function IsUsernameAvailable($username): bool{
+            $this->EscapeString($username);
             return !$this->db->Exists("user", $username, "username");
         }
 
@@ -49,6 +53,8 @@
 
         public function Save($user){
             $sql = "";
+
+            $this->EscapeString($user);
 
             $args = array(
                 ":username" => $user->Username,

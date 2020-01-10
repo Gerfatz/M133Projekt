@@ -1,11 +1,14 @@
 <nav class="navbar bg-navigation mb-w">
     <div class="d-flex">
-        <input class="form-control" type="text" name="searchQuery" id="search"/>
-        <button class="btn btn-primary" title="Suchen" onclick="SearchContent(document.getElementById('search').value)">
-            <span class="text-white">
-                <i class="fa fa-search"></i>
-            </span>
-        </button>
+        <form method="GET" class="d-flex" action="%url%/Post/index.php">
+            <input class="form-control" type="text" name="query" id="search"/>
+            <button type="submit" class="btn btn-primary" title="Suchen">
+                <span class="text-white">
+                    <i class="fa fa-search"></i>
+                </span>
+            </button>
+        </form>
+
     </div>
     <div>
         <ul class="nav">
@@ -16,7 +19,7 @@
                 <a class="nav-link" href="%url%/Kategorien">Kategorien</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="%url%/Posts">Posts</a>
+                <a class="nav-link" href="%url%/Post">Posts</a>
             </li>
         </ul>
     </div>

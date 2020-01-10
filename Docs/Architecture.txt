@@ -23,7 +23,21 @@ Die Librarys wie Bootstrap und JQuery sind Lokal gespeichert, da so eine Entwick
 (Ich war über Weihnachten in Österreich, wo ich kein Internet hatte)
 
 Die JavaScript Entwicklung wurde durch TypeScript erleichtert, dies ermöglicht Ebenfalls ein leichteres nachvollziehen des Codes.
-Die Selbst geschriebenen Files sind in Scripts/src zu finden.
+Die Selbst geschriebenen Files sind in Scripts/src zu finden. Dieses Verzeichnis hat mehrere Unterverzeichnisse. 
+
+"api" enthält die API Klasse, welche die Request generiert. 
+
+"models" enthält Klassen, welche eine Datenstruktur beinhalten. Diese werden meistens im Zusammmenhangmit einer API benutzt.
+
+"polyfills" enthält eine Funktion welche das suchen von Elementen erleichtert. Sie heisst find und funtioniert mittels dem ref Attribut
+
+"UI" ist für das Rendering und abarbeiten von Benutzereingaben verantwortlich.
+
+main.ts enthält einige sehr allgemeien sachen. Und die CreateElement Funktion.
+
+validation.tsx enthält die Klasse, welche im Header aufgerufen wird und die falsch ausgefüllten Eingabefelder markiert.
+
+
 
 React.js wird zwar nicht verwendet, jedoch die von React bekannte jsx syntax (HTML im JavaScript). Die Funktion die die Elemente
 erstellt heisst CreateElement und ist im File main.ts zu finden.

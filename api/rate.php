@@ -5,7 +5,9 @@
     require_once(GetPath() . "BusinessLogic/Repositories/PostRepository.php");
     require_once(GetPath() . "security.php");
 
-    RerouteUnauthenticated();
+    if(!isset($_SESSION["UserId"])){
+        http_response_code(401);
+    }
 
     if((!isset($_GET["postId"]) || !isset($_GET["rating"])) && $_GET["rating"] <= 5 && $_GET["rating"] > 0){
         http_response_code(400);

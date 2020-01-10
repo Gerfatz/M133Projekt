@@ -7,6 +7,7 @@
         return GetPartial("_header", array(
             "title" => $title,
             "url" => GetConfigValue("url"),
+            "isLoggedIn" => isset($_SESSION["UserId"]) ? "true" : "false",
             "errors" => Validator::GetJSON()
         ));
     }

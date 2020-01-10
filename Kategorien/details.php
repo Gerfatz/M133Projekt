@@ -47,15 +47,6 @@
                     <div class="card-body">
                         <h2 class="card-title" ref="title">
                             <? echo $category->Name?>
-                            <? 
-                                if($category->IsOwner){
-                                    ?>
-                                        <a class="float-right ml-2" href="<?echo GetConfigValue("url")?>/Kategorien/edit.php?categoryId=<?echo $category->Id?>">
-                                            <i class="fa fa-pencil-alt text-primary"></i>
-                                        </a>
-                                    <?
-                                }
-                            ?>
                         </h2>
                         <p><?echo $category->Description?></p>
                         <? 

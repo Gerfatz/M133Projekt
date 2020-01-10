@@ -51,21 +51,33 @@ class PostUI {
         currentRating: number
     ) {
         const stars = new Array<HTMLElement>();
-        const ratingClick = e => {
-            const userRating = e.target.getAttribute("value");
+        const ratingClick = async (e) => {
+            if(Config.isLoggedIn){
+                const userRating = e.target.getAttribute("value");
 
-            API.GET("/api/rate.php", {
-                rating: e.target.getAttribute("value"),
-                postId: postId
-            });
+                try{
+                    await API.GET("/api/rate.php", {
+                        rating: e.target.getAttribute("value"),
+                        postId: postId
+                    });
+                }
+                catch{
+                    parent.appendChild(<p class="text-danger">Sie sind nicht eingeloggt</p>)
+                }
+    
+    
+                stars
+                    .filter(i => i.getAttribute("value") <= userRating)
+                    .forEach(i => (i.className = "fas fa-star cursor-pointer"));
+    
+                stars
+                    .filter(i => i.getAttribute("value") > userRating)
+                    .forEach(i => (i.className = "far fa-star cursor-pointer"));
+            }
+            else{
+                location.href = Config.baseUrl + "/Account/login.php";
+            }
 
-            stars
-                .filter(i => i.getAttribute("value") <= userRating)
-                .forEach(i => (i.className = "fas fa-star cursor-pointer"));
-
-            stars
-                .filter(i => i.getAttribute("value") > userRating)
-                .forEach(i => (i.className = "far fa-star cursor-pointer"));
         };
 
         let i = 1;
@@ -100,25 +112,30 @@ class PostUI {
         res = JSON.parse(res) as Array<CommentViewModel>;
 
         const renderEdit = (parent: HTMLElement, parentId: number) => {
-            const edit = parent.appendChild(<div class="ml-1 mb-2">
+            if(Config.isLoggedIn){
+                const edit = parent.appendChild(<div class="ml-1 mb-2">
                 <div class="form-control-group mb-2">
                     <label for="text">Text</label>
                     <input class="form-control" type="text" id="text" ref="text"/>
                 </div>
-                <button onclick={async () => {
+                <button ref="comment-button" onclick={async () => {
                     const input = edit.find("text").value;
                     if(validateXSS(input)){
                         const model = new CommentViewModel();
                         model.Text = input;
                         model.ParentId = parentId;
-
-                        await API.POST("/api/comment.php", model);
-
-                        container.textContent = "";
-                        this.RenderComments(container, postId);
+                        try{
+                            await API.POST("/api/comment.php", model);
+                            container.textContent = "";
+                            this.RenderComments(container, postId);
+                        }
+                        catch{
+                            edit.appendChild(<p class="text-danger">Sie sind nicht eingeloggt</p>)
+                        }
                     }
                 }} class="btn btn-primary">Kommentieren</button>
             </div>);
+            }
         }
 
         container.appendChild(<h5 class="ml-2">Kommentare</h5>);

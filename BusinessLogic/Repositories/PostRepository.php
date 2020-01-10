@@ -4,15 +4,9 @@
     include_once(GetPath() . "BusinessLogic/ViewModels/CommentViewModel.php");
 
     class PostRepository extends RepositoryBase{
-        public function GetPostById(int $id, bool $withComments): PostViewModel{
-            $sql = "";
-            if($withComments){
-                $sql = ""; 
-            }
-        }
 
         public function GetAllPostsFromCategory(int $categoryId, int $userId = 0): array{
-            $sql = "SELECT post.Id AS Id, post.title AS Title, post.categoryId AS CategoryId, post.creatorId AS CreatorId, post.uploadDate AS UploadDate, post.fileName AS FileName, ( SELECT category.name FROM category WHERE post.categoryId = category.Id ) AS CategoryName, ( SELECT user.username FROM user WHERE post.creatorId = user.Id ) AS CreatorName, (SELECT rating.rating FROM rating WHERE PostId = post.Id AND UserId = :userId) AS Rating, (SELECT AVG(rating.rating) FROM rating WHERE rating.PostId = post.Id) AS Score FROM post WHERE categoryId = :categoryId ORDER BY Score DESC";
+            $sql = "SELECT post.Id AS Id, post.title AS Title, post.categoryId AS CategoryId, post.creatorId AS CreatorId, post.uploadDate AS UploadDate, post.fileName AS FileName, ( SELECT category.name FROM category WHERE post.categoryId = category.Id ) AS CategoryName, ( SELECT user.username FROM user WHERE post.creatorId = user.Id ) AS CreatorName, (SELECT rating.rating FROM rating WHERE PostId = post.Id AND UserId = :userId) AS Rating, (SELECT AVG(rating.rating) / (Datediff(Current_Date, post.uploadDate) + 1) FROM rating WHERE rating.PostId = post.Id) AS Score FROM post WHERE categoryId = :categoryId ORDER BY Score DESC";
             $sql = str_replace(":categoryId", $categoryId, $sql);
             $sql = str_replace(":userId", $userId, $sql);
             $statement = $this->db->Query($sql);
@@ -22,10 +16,34 @@
 
         public function GetPostsFromUser(int $userToViewId, int $currentUserId)
         {
-            $sql = "SELECT post.Id AS Id, post.title AS Title, post.categoryId AS CategoryId, post.creatorId AS CreatorId, post.uploadDate AS UploadDate, post.fileName AS FileName, ( SELECT category.name FROM category WHERE post.categoryId = category.Id ) AS CategoryName, ( SELECT user.username FROM user WHERE post.creatorId = user.Id ) AS CreatorName, (SELECT rating.rating FROM rating WHERE PostId = post.Id AND UserId = :cuserId) AS Rating, (SELECT AVG(rating.rating) FROM rating WHERE rating.PostId = post.Id) AS Score FROM post WHERE creatorId = :userId AND parentId IS NULL ORDER BY Score DESC";
+            $sql = "SELECT post.Id AS Id, post.title AS Title, post.categoryId AS CategoryId, post.creatorId AS CreatorId, post.uploadDate AS UploadDate, post.fileName AS FileName, ( SELECT category.name FROM category WHERE post.categoryId = category.Id ) AS CategoryName, ( SELECT user.username FROM user WHERE post.creatorId = user.Id ) AS CreatorName, (SELECT rating.rating FROM rating WHERE PostId = post.Id AND UserId = :cuserId) AS Rating, (SELECT AVG(rating.rating) / (Datediff(Current_Date, post.uploadDate) + 1) FROM rating WHERE rating.PostId = post.Id) AS Score FROM post WHERE creatorId = :userId AND parentId IS NULL ORDER BY Score DESC";
             $sql = str_replace(":cuserId", $currentUserId, $sql);
             $sql = str_replace(":userId", $userToViewId, $sql);
             $statement = $this->db->Query($sql);
+            $statement->setFetchMode(PDO::FETCH_CLASS, "PostViewModel");
+            return $statement->fetchAll();
+        }
+
+        public function GetHomePage(int $userId = 0)
+        {
+            $sql = "SELECT post.Id AS Id, post.title AS Title, post.categoryId AS CategoryId, post.creatorId AS CreatorId, post.uploadDate AS UploadDate, post.fileName AS FileName, ( SELECT category.name FROM category WHERE post.categoryId = category.Id ) AS CategoryName, ( SELECT user.username FROM user WHERE post.creatorId = user.Id ) AS CreatorName, (SELECT rating.rating FROM rating WHERE PostId = post.Id AND UserId = $userId) AS Rating, (SELECT AVG(rating.rating) / (Datediff(Current_Date, post.uploadDate) + 1) FROM rating WHERE rating.PostId = post.Id) AS Score FROM post WHERE parentId IS NULL :categoryClause ORDER BY Score DESC";
+            if($userId == 0){
+                $sql = str_replace(":categoryClause", "", $sql);
+            }
+            else{
+                $sql = str_replace(":categoryClause", "AND post.categoryId IN (SELECT CategoryId FROM subscription WHERE UserId = $userId)", $sql);
+            }
+
+            $statement = $this->db->Query($sql);
+            $statement->setFetchMode(PDO::FETCH_CLASS, "PostViewModel");
+            return $statement->fetchAll();
+        }
+
+        public function GetPostPage(int $userId, string $title = "")
+        {
+            $sql = "SELECT post.Id AS Id, post.title AS Title, post.categoryId AS CategoryId, post.creatorId AS CreatorId, post.uploadDate AS UploadDate, post.fileName AS FileName, ( SELECT category.name FROM category WHERE post.categoryId = category.Id ) AS CategoryName, ( SELECT user.username FROM user WHERE post.creatorId = user.Id ) AS CreatorName, (SELECT rating.rating FROM rating WHERE PostId = post.Id AND UserId = $userId) AS Rating, (SELECT AVG(rating.rating) / (Datediff(Current_Date, post.uploadDate) + 1) FROM rating WHERE rating.PostId = post.Id) AS Score FROM post WHERE parentId IS NULL AND LOWER(post.title) LIKE :search ORDER BY Score DESC";
+            $statement = $this->db->PrepareQuery($sql);            
+            $statement->execute(array(":search" => "%" . strtolower($title) . "%"));
             $statement->setFetchMode(PDO::FETCH_CLASS, "PostViewModel");
             return $statement->fetchAll();
         }
@@ -36,7 +54,7 @@
                 ":parentId" => $postId,
                 ":userId" => $userId
             );
-            $sql = "SELECT post.Id AS Id, post.creatorId AS CreatorId, post.uploadDate AS UploadDate, post.fileName AS FileName, post.text AS Text, ( SELECT user.username FROM user WHERE post.creatorId = user.Id ) AS CreatorName, (SELECT rating.rating FROM rating WHERE PostId = post.Id AND UserId = :userId) AS Rating, (SELECT AVG(rating.rating) FROM rating WHERE rating.PostId = post.Id) AS Score FROM post WHERE parentId = :parentId ORDER BY Score DESC";
+            $sql = "SELECT post.Id AS Id, post.creatorId AS CreatorId, post.uploadDate AS UploadDate, post.fileName AS FileName, post.text AS Text, ( SELECT user.username FROM user WHERE post.creatorId = user.Id ) AS CreatorName, (SELECT rating.rating FROM rating WHERE PostId = post.Id AND UserId = :userId) AS Rating, (SELECT AVG(rating.rating) / (Datediff(Current_Date, post.uploadDate) + 1) FROM rating WHERE rating.PostId = post.Id) AS Score FROM post WHERE parentId = :parentId ORDER BY Score DESC";
             $statement = $this->db->PrepareQuery($sql);
             $statement->setFetchMode(PDO::FETCH_CLASS, "CommentViewModel");
             $statement->execute($args);
@@ -89,6 +107,8 @@
         public function SaveComment(array $model){
             $sql = "";
 
+            $this->EscapeString($model);
+
             if(!isset($model["Id"]) || $model["Id"] == 0){
                 $sql = "INSERT INTO post (creatorId, parentId, text) VALUES (:CreatorId, :ParentId, :Text)";
                 $statement = $this->db->PrepareQuery($sql);
@@ -110,8 +130,10 @@
             }
         }
 
-        public function Save($model): PostViewModel{
+        public function Save($model){
             $sql = "";
+
+            $this->EscapeString($model);
 
             if($model->Id == 0){
                 $sql = "INSERT INTO post (creatorId, categoryId, title, fileName) VALUES (:creatorId, :categoryId, :title, :path)";

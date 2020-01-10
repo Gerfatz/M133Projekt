@@ -26,7 +26,10 @@
             break;
         case "POST":
         case "PUT":
-            RerouteUnauthenticated();
+            if($userId == 0){
+                http_response_code(401);
+            }
+
             $data = file_get_contents('php://input');
             $model = json_decode($data, true);
             $model["CreatorId"] = $userId;
